@@ -1,152 +1,152 @@
 [
   {
-    "MapDisplayName": "Fattoria",
+    "MapDisplayName": "nav.map.farm",
     "MapLocationName": "Farm",
     "PointsOfInterest": [
       {
-        "DisplayName": "Casa del Fattore",
+        "DisplayName": "nav.poi.farmhouse",
         "TargetLocationName": "FarmHouse"
       }
     ]
   },
   {
-    "MapDisplayName": "Pelican Town",
+    "MapDisplayName": "nav.map.town",
     "MapLocationName": "Town",
     "PointsOfInterest": [
       {
-        "DisplayName": "Negozio di Pierre",
+        "DisplayName": "nav.poi.seedshop",
         "TargetLocationName": "SeedShop"
       },
       {
-        "DisplayName": "Clinica di Harvey",
+        "DisplayName": "nav.poi.hospital",
         "TargetLocationName": "Hospital"
       },
       {
-        "DisplayName": "Officina di Clint",
+        "DisplayName": "nav.poi.blacksmith",
         "TargetLocationName": "Blacksmith"
       },
       {
-        "DisplayName": "Taverna di Gus",
+        "DisplayName": "nav.poi.saloon",
         "TargetLocationName": "Saloon"
       },
       {
-        "DisplayName": "Biblioteca",
+        "DisplayName": "nav.poi.archaeologyhouse",
         "TargetLocationName": "ArchaeologyHouse"
       },
       {
-        "DisplayName": "Municipio",
+        "DisplayName": "nav.poi.manorhouse",
         "TargetLocationName": "ManorHouse"
       },
       {
-        "DisplayName": "Centro Comunitario",
+        "DisplayName": "nav.poi.communitycenter",
         "TargetLocationName": "CommunityCenter"
       },
       {
-        "DisplayName": "Casa di Haley ed Emily",
+        "DisplayName": "nav.poi.haleyhouse",
         "TargetLocationName": "HaleyHouse"
       },
       {
-        "DisplayName": "Casa di Sam e Vincent",
+        "DisplayName": "nav.poi.samhouse",
         "TargetLocationName": "SamHouse"
       },
       {
-        "DisplayName": "Casa di Alex e famiglia",
+        "DisplayName": "nav.poi.joshhouse",
         "TargetLocationName": "JoshHouse"
       },
       {
-        "DisplayName": "Roulotte di Pam",
+        "DisplayName": "nav.poi.trailer",
         "TargetLocationName": "Trailer"
       }
     ]
   },
   {
-    "MapDisplayName": "Spiaggia",
+    "MapDisplayName": "nav.map.beach",
     "MapLocationName": "Beach",
     "PointsOfInterest": [
       {
-        "DisplayName": "Negozio di Willy",
+        "DisplayName": "nav.poi.fishshop",
         "TargetLocationName": "FishShop"
       },
       {
-        "DisplayName": "Capanna di Elliott",
+        "DisplayName": "nav.poi.elliotthouse",
         "TargetLocationName": "ElliottHouse"
       }
     ]
   },
   {
-    "MapDisplayName": "Montagna",
+    "MapDisplayName": "nav.map.mountain",
     "MapLocationName": "Mountain",
     "PointsOfInterest": [
       {
-        "DisplayName": "Miniera - Ingresso",
+        "DisplayName": "nav.poi.mine",
         "TargetLocationName": "Mine"
       },
       {
-        "DisplayName": "Gilda degli Avventurieri",
+        "DisplayName": "nav.poi.adventureguild",
         "TargetLocationName": "AdventureGuild"
       },
       {
-        "DisplayName": "Casa di Robin e famiglia",
+        "DisplayName": "nav.poi.sciencehouse",
         "TargetLocationName": "ScienceHouse"
       }
     ]
   },
   {
-    "MapDisplayName": "Foresta di Cindersap",
+    "MapDisplayName": "nav.map.forest",
     "MapLocationName": "Forest",
     "PointsOfInterest": [
       {
-        "DisplayName": "Capanna di Leah",
+        "DisplayName": "nav.poi.leahhouse",
         "TargetLocationName": "LeahHouse"
       },
       {
-        "DisplayName": "Fattoria di Marnie",
+        "DisplayName": "nav.poi.animalshop",
         "TargetLocationName": "AnimalShop"
       },
       {
-        "DisplayName": "Torre del Mago",
+        "DisplayName": "nav.poi.wizardhouse",
         "TargetLocationName": "WizardHouse"
       }
     ]
   },
   {
-    "MapDisplayName": "Fermata Bus",
+    "MapDisplayName": "nav.map.busstop",
     "MapLocationName": "BusStop",
     "PointsOfInterest": [
       {
-        "DisplayName": "Area partenza",
+        "DisplayName": "nav.poi.busstop_departure",
         "ArrivalX": 4,
         "ArrivalY": 4
       }
     ]
   },
   {
-    "MapDisplayName": "Ferrovia",
+    "MapDisplayName": "nav.map.railroad",
     "MapLocationName": "Railroad",
     "PointsOfInterest": [
       {
-        "DisplayName": "Terme",
+        "DisplayName": "nav.poi.bathhouse",
         "TargetLocationName": "BathHouse_Entry"
       }
     ]
   },
   {
-    "MapDisplayName": "Bosco di Retro Fattoria",
+    "MapDisplayName": "nav.map.backwoods",
     "MapLocationName": "Backwoods",
     "PointsOfInterest": [
       {
-        "DisplayName": "Sentiero settentrionale",
+        "DisplayName": "nav.poi.backwoods_northpath",
         "ArrivalX": 40,
         "ArrivalY": 15
       }
     ]
   },
   {
-    "MapDisplayName": "Bosco Segreto",
+    "MapDisplayName": "nav.map.woods",
     "MapLocationName": "Woods",
     "PointsOfInterest": [
       {
-        "DisplayName": "Radura",
+        "DisplayName": "nav.poi.woods_clearing",
         "ArrivalX": 30,
         "ArrivalY": 15
       }

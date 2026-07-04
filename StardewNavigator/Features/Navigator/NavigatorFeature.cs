@@ -33,6 +33,7 @@ namespace StardewNavigator.Features.Navigator
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.Player.Warped += OnPlayerWarped;
 
+#if DEBUG
             // Registra il comando di console SMAPI per il test di fallback deterministico
             helper.ConsoleCommands.Add("navigator_test_fallback", "Testa il funzionamento del fallback di collisione per BusStop (11,6)", (cmd, args) =>
             {
@@ -65,6 +66,7 @@ namespace StardewNavigator.Features.Navigator
                     Log.Error($"TEST RISULTATO: FAIL ❌ (targetCollides={targetCollides}, resultCollides={resultCollides}, result={result})");
                 }
             });
+#endif
         }
 
         private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)

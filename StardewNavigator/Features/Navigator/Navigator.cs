@@ -558,7 +558,7 @@ namespace StardewNavigator.Features.Navigator
                 {
                     player.controller = null;
                 }
-                else if (player.controller != null && player.controller.GetType().FullName?.Contains("PathFindController") == true)
+                else if (player.controller is PathFindController)
                 {
                     // Rilascia in modo sicuro qualsiasi pathfind controller residuo
                     player.controller = null;

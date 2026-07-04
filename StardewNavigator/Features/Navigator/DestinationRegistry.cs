@@ -115,14 +115,26 @@ namespace StardewNavigator.Features.Navigator
                 }
             }
 
-            // Filtra le mappe senza POI risolti
+            // Filtra le mappe senza POI risolti e risolve le traduzioni dei display name
             int mapsBeforeFilter = _maps.Count;
             _maps = _maps
                 .Select(m => new MapDestination
                 {
-                    MapDisplayName = m.MapDisplayName,
+                    MapDisplayName = ModEntry.Helper.Translation.Get(m.MapDisplayName).ToString(),
                     MapLocationName = m.MapLocationName,
-                    PointsOfInterest = m.PointsOfInterest.Where(p => p.IsResolved).ToList()
+                    PointsOfInterest = m.PointsOfInterest
+                        .Where(p => p.IsResolved)
+                        .Select(p => new PointOfInterest
+                        {
+                            DisplayName = ModEntry.Helper.Translation.Get(p.DisplayName).ToString(),
+                            TargetLocationName = p.TargetLocationName,
+                            ArrivalX = p.ArrivalX,
+                            ArrivalY = p.ArrivalY,
+                            ResolvedArrivalTile = p.ResolvedArrivalTile,
+                            ResolvedLocationName = p.ResolvedLocationName,
+                            IsResolved = p.IsResolved
+                        })
+                        .ToList()
                 })
                 .Where(m => m.PointsOfInterest.Count > 0)
                 .ToList();
