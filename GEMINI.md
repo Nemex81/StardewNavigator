@@ -16,7 +16,7 @@ This document provides context, architectural constraints, rules, and workflows 
 - **Pacchetti NuGet**:
   - `Pathoschild.Stardew.ModBuildConfig` (compilazione e deploy automatico)
 - **Integrazioni (Soft Dependency)**:
-  - **stardew-access** (`shoaib.stardewaccess` o `stardew.access`): Se rilevato all'avvio del gioco, il navigatore indirizza le istruzioni vocali direttamente allo screen reader tramite riflessione (reflection) per evitare accoppiamenti forti a livello di codice compilato.
+  - **stardew-access** (Unique ID SMAPI: `shoaib.stardewaccess` o `stardew.access`): Se rilevato all'avvio del gioco nel registro mod SMAPI, il navigatore indirizza le istruzioni vocali direttamente allo screen reader tramite riflessione (reflection) per evitare accoppiamenti forti a livello di codice compilato.
     - *Contratto di Reflection Attuale* (osservato e da preservare, modificabile solo con test e approvazione esplicita):
       * Assembly target: `"stardew-access"`
       * Classe: `stardew_access.MainClass`
@@ -127,7 +127,7 @@ Per pubblicare una nuova versione del mod, attenersi rigorosamente alla seguente
    `dotnet build StardewNavigator.sln --configuration Release`
    Il file zip verrà posizionato in `StardewNavigator/bin/Release/net6.0/StardewNavigator [Versione].zip`.
 3. **Verifica ZIP (Checklist Pre-Release)**: Scompattare temporaneamente o ispezionare il file ZIP generato per verificare che contenga la build compilata corretta, che le risorse (cartella `assets/`, cartella `i18n/`) siano presenti ed aggiornate, e che il `manifest.json` mostri la versione corretta appena configurata.
-4. **Commit Bump**: Committare la modifica del manifest (`git commit -m "chore: bump version to vX.Y.Z"`).
+4. **Commit Bump**: Committare la modifica del manifest (`git commit -m "chore(manifest): bump version to vX.Y.Z"`).
 5. **Tagging**: Creare il tag Git corrispondente (`git tag vX.Y.Z`).
 6. **Push branch**: Pushare il branch main (`git push origin main`).
 7. **Push tag**: Pushare il tag Git (`git push origin vX.Y.Z`).
