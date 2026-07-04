@@ -1,4 +1,7 @@
 using System;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -24,6 +27,56 @@ namespace StardewNavigator
             _navigatorFeature = new NavigatorFeature(helper);
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+        }
+
+        private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
+        {
+            if (Config.CheckForUpdatesOnStartup)
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        using (var client = new HttpClient())
+                        {
+                            client.DefaultRequestHeaders.Add("User-Agent", "StardewNavigator");
+                            var response = await client.GetStringAsync("https://api.github.com/repos/Nemex81/StardewNavigator/releases/latest");
+                            
+                            using (var doc = JsonDocument.Parse(response))
+                            {
+                                if (doc.RootElement.TryGetProperty("tag_name", out var tagProp))
+                                {
+                                    string latestTag = tagProp.GetString() ?? string.Empty;
+                                    string cleanTag = latestTag.TrimStart('v');
+                                    var latestVersion = new Version(cleanTag);
+                                    
+                                    var currentVer = ModManifest.Version;
+                                    var currentVersion = new Version(currentVer.MajorVersion, currentVer.MinorVersion, currentVer.PatchVersion);
+
+                                    if (latestVersion > currentVersion)
+                                    {
+                                        // Delay per attendere il caricamento completo del mondo
+                                        await Task.Delay(4000);
+                                        
+                                        string message = Helper.Translation.Get("update-available", new { version = latestTag }).ToString();
+                                        if (string.IsNullOrEmpty(message) || message == "update-available")
+                                        {
+                                            message = $"StardewNavigator: è disponibile la versione {latestTag}. Apri il menu opzioni per aggiornare.";
+                                        }
+
+                                        NavigatorSpeaker.Say(message, interrupt: false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Monitor.Log($"Errore nel controllo aggiornamenti: {ex.Message}", LogLevel.Debug);
+                    }
+                });
+            }
         }
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
@@ -58,6 +111,14 @@ namespace StardewNavigator
                     max: 10.0f,
                     interval: 0.5f
                 );
+
+                configMenu.AddBoolOption(
+                    mod: ModManifest,
+                    name: () => Helper.Translation.Get("config.check-updates.name"),
+                    tooltip: () => Helper.Translation.Get("config.check-updates.tooltip"),
+                    getValue: () => Config.CheckForUpdatesOnStartup,
+                    setValue: value => Config.CheckForUpdatesOnStartup = value
+                );
             }
         }
     }
@@ -67,5 +128,6 @@ namespace StardewNavigator
         void Register(IManifest mod, Action reset, Action save, bool titleScreenOnly = false);
         void AddKeybindList(IManifest mod, Func<KeybindList> getValue, Action<KeybindList> setValue, Func<string> name, Func<string>? tooltip = null, string? fieldId = null);
         void AddNumberOption(IManifest mod, Func<float> getValue, Action<float> setValue, Func<string> name, Func<string>? tooltip = null, float? min = null, float? max = null, float? interval = null, Func<float, string>? formatVal = null, string? fieldId = null);
+        void AddBoolOption(IManifest mod, Func<bool> getValue, Action<bool> setValue, Func<string> name, Func<string>? tooltip = null, string? fieldId = null);
     }
 }

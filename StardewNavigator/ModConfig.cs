@@ -11,5 +11,8 @@ namespace StardewNavigator
         // Durata in secondi dei messaggi HUD per giocatori normovedenti (default: 4.0)
         // Range consigliato: 1.0 - 10.0
         public float HudMessageDuration { get; set; } = 4.0f;
+
+        // Controlla la presenza di aggiornamenti all'avvio
+        public bool CheckForUpdatesOnStartup { get; set; } = true;
     }
 }

@@ -17,5 +17,8 @@
   "config.navigator-menu-key.name": "Navigation Menu Key",
   "config.navigator-menu-key.tooltip": "The keybind used to open the navigator menu.",
   "config.hud-duration.name": "HUD Message Duration",
-  "config.hud-duration.tooltip": "How long temporary on-screen messages remain visible (in seconds)."
+  "config.hud-duration.tooltip": "How long temporary on-screen messages remain visible (in seconds).",
+  "update-available": "StardewNavigator: version {{version}} is available. Run the installer to update.",
+  "config.check-updates.name": "Check Updates on Startup",
+  "config.check-updates.tooltip": "Check GitHub for newer versions of StardewNavigator on startup."
 }
