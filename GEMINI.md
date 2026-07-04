@@ -16,7 +16,13 @@ This document provides context, architectural constraints, rules, and workflows 
 - **Pacchetti NuGet**:
   - `Pathoschild.Stardew.ModBuildConfig` (compilazione e deploy automatico)
 - **Integrazioni (Soft Dependency)**:
-  - **stardew-access** (`shoaib.stardewaccess`): Se rilevato all'avvio del gioco, il navigatore indirizza le istruzioni vocali direttamente allo screen reader tramite riflessione (reflection) per evitare accoppiamenti forti a livello di codice compilato.
+  - **stardew-access** (`shoaib.stardewaccess` o `stardew.access`): Se rilevato all'avvio del gioco, il navigatore indirizza le istruzioni vocali direttamente allo screen reader tramite riflessione (reflection) per evitare accoppiamenti forti a livello di codice compilato.
+    - *Contratto di Reflection Attuale* (osservato e da preservare, modificabile solo con test e approvazione esplicita):
+      * Assembly target: `"stardew-access"`
+      * Classe: `stardew_access.MainClass`
+      * Proprietà statica: `ScreenReader` (ritorna l'istanza dello screen reader)
+      * Metodo istanza: `Say` con firma `void Say(string text, bool interrupt)`
+      * Sicurezza runtime: La riflessione deve essere protetta da un blocco `try-catch` ed eseguire il caching tramite un flag `reflectionAttempted` per evitare tentativi ripetuti falliti ad ogni tick.
   - **Generic Mod Config Menu (GMCM)**: Se rilevato, espone le opzioni di configurazione nel menu impostazioni in-game.
 
 ---
@@ -82,9 +88,9 @@ Per installare, aggiornare o disinstallare manualmente il mod in locale, fare do
 
 ## 4. Regole di sviluppo permanenti
 
-- **Always** garantire 0 errori e 0 avvisi nella build di Release prima di committare, taggare o pushare modifiche.
-- **Never** committare file machine-specific come `StardewNavigator.csproj.user` (gia ignorato in `.gitignore`).
-- **Must** utilizzare **Conventional Commits** per ogni commit (es. `feat: ...`, `fix: ...`).
+- **Always** garantire 0 errori e 0 avvisi (inclusi sia compiler warnings sia static analyzer warnings) nella build locale di Release prima di committare, taggare o pushare modifiche.
+- **Never** committare file machine-specific o configurazioni locali come `StardewNavigator.csproj.user` o `installer/config.json` (già ignorati in `.gitignore`). Se un file machine-specific o temporaneo (es. `StardewNavigator.csproj.user`, `installer/config.json`, cartelle `bin/`, `obj/`) viene tracciato per errore, va rimosso dall'indice di git usando `git rm --cached <file>`.
+- **Must** utilizzare **Conventional Commits** in **lingua inglese** per ogni commit (es. `feat: ...`, `fix: ...`). I messaggi non devono essere generici e devono descrivere chiaramente il cambiamento.
 - **Must** localizzare i testi tramite chiavi i18n standard di SMAPI (in `i18n/default.json`). Non inserire stringhe hardcoded nel codice C# o nel file `navigator_destinations.json`.
 - **Never** invocare direttamente librerie di `stardew-access` a tempo di compilazione. Qualsiasi interazione deve passare attraverso la reflection implementata in `NavigatorSpeaker.cs`.
 - **Always** chiedere chiarimenti all'utente prima di effettuare grandi refactoring o cambiamenti all'algoritmo di routing BFS.
@@ -104,24 +110,30 @@ All'avvio del gioco, se `CheckForUpdatesOnStartup` è attivo, `ModEntry.cs` eseg
 ## 6. Git workflow e release management
 
 ### Convenzioni Commit
-Format obbligatorio dei messaggi di commit:
-`<tipo>: <descrizione>`
+Tutti i commit devono essere scritti in **lingua inglese**, essere descrittivi e seguire il formato:
+`<tipo>(<ambito>): <descrizione>` (con ambito opzionale)
 Tipi supportati: `feat`, `fix`, `docs`, `refactor`, `perf`, `chore`.
+
+### Checklist Pre-Push
+Prima di effettuare il push su GitHub:
+1. Eseguire `git status` per assicurarsi che non siano stati accidentalmente indicizzati file machine-specific (`csproj.user`), file locali dell'installer (`installer/config.json`) o cartelle temporanee (`bin/`, `obj/`).
+2. Se presenti nello stage, rimuoverli dall'indice tramite `git rm --cached <file>`.
 
 ### Flusso di Release Obbligatorio
 Per pubblicare una nuova versione del mod, attenersi rigorosamente alla seguente sequenza:
 
 1. **Bump Versione**: Aggiornare il campo `"Version"` nel file `StardewNavigator/manifest.json`.
-2. **Build Release**: Eseguire il build in configurazione Release per generare lo zip del pacchetto:
+2. **Build Release**: Eseguire il build locale in configurazione Release per generare lo zip del pacchetto:
    `dotnet build StardewNavigator.sln --configuration Release`
    Il file zip verrà posizionato in `StardewNavigator/bin/Release/net6.0/StardewNavigator [Versione].zip`.
-3. **Commit Bump**: Committare la modifica del manifest (`git commit -m "chore: bump version to vX.Y.Z"`).
-4. **Tagging**: Creare il tag Git corrispondente (`git tag vX.Y.Z`).
-5. **Push branch**: Pushare il branch main (`git push origin main`).
-6. **Push tag**: Pushare il tag Git (`git push origin vX.Y.Z`).
-7. **Release GitHub**: Creare la release con GitHub CLI:
+3. **Verifica ZIP (Checklist Pre-Release)**: Scompattare temporaneamente o ispezionare il file ZIP generato per verificare che contenga la build compilata corretta, che le risorse (cartella `assets/`, cartella `i18n/`) siano presenti ed aggiornate, e che il `manifest.json` mostri la versione corretta appena configurata.
+4. **Commit Bump**: Committare la modifica del manifest (`git commit -m "chore: bump version to vX.Y.Z"`).
+5. **Tagging**: Creare il tag Git corrispondente (`git tag vX.Y.Z`).
+6. **Push branch**: Pushare il branch main (`git push origin main`).
+7. **Push tag**: Pushare il tag Git (`git push origin vX.Y.Z`).
+8. **Release GitHub**: Creare la release con GitHub CLI:
    `gh release create vX.Y.Z --title "vX.Y.Z — Titolo" --notes "Note di rilascio"`
-8. **Upload ZIP**: Allegare lo zip generato in precedenza alla release creata:
+9. **Upload ZIP**: Allegare lo zip verificato alla release creata:
    `gh release upload vX.Y.Z "StardewNavigator/bin/Release/net6.0/StardewNavigator [Versione].zip"`
 
 ---
