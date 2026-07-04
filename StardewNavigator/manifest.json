@@ -6,7 +6,7 @@
   "UniqueID": "Nemex81.StardewNavigator",
   "EntryDll": "StardewNavigator.dll",
   "MinimumApiVersion": "4.0.0",
-  "UpdateKeys": [],
+  "UpdateKeys": [ "GitHub:Nemex81/StardewNavigator" ],
   "Dependencies": [
     {
       "UniqueID": "shoaib.stardewaccess",
