@@ -12,3 +12,6 @@ obj/
 ## OS-specific
 .DS_Store
 Thumbs.db
+
+## Installer Local Config
+installer/config.json
