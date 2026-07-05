@@ -18,7 +18,20 @@ namespace StardewNavigator.Features.Navigator
             RouteEngine routeEngine)
         {
             if (!ModEntry.Config.NumpadControlsActive) return false;
+
+            // Intercetta solo se il NumLock è attivo fisicamente
+            if (!IsNumLockActive()) return false;
+
             if (!Context.IsWorldReady) return false;
+
+            // Se viene premuto un tasto scanner matematico, verifica la presenza dell'Object Tracker di stardew-access.
+            // Se non è installata, lasciamo passare il tasto al gioco.
+            bool isScannerKey = e.Button == SButton.Divide || e.Button == SButton.Multiply || 
+                                e.Button == SButton.Add || e.Button == SButton.Subtract;
+            if (isScannerKey && GetObjectTrackerInstance() == null)
+            {
+                return false;
+            }
 
             bool ctrlPressed = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
             bool isPlayerFree = Context.IsPlayerFree;
@@ -32,6 +45,57 @@ namespace StardewNavigator.Features.Navigator
             }
 
             bool shiftPressed = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
+
+            // 1. Comandi dello Scanner (Object Tracker) tramite tasti matematici
+            if (e.Button == SButton.Divide)
+            {
+                if (ctrlPressed)
+                {
+                    TriggerObjectTrackerAction("MoveToCurrentlySelectedObject");
+                }
+                else
+                {
+                    TriggerObjectTrackerAction("ReadCurrentlySelectedObject", new object[] { false });
+                }
+                return true;
+            }
+            if (e.Button == SButton.Multiply)
+            {
+                TriggerObjectTrackerAction("ReadCurrentlySelectedObject", new object[] { true });
+                return true;
+            }
+            if (e.Button == SButton.Add)
+            {
+                if (ctrlPressed)
+                {
+                    TriggerObjectTrackerCycle(1, back: true); // OBJECT_GROUP Up
+                }
+                else if (shiftPressed)
+                {
+                    TriggerObjectTrackerCycle(0, back: true); // CATEGORY Up
+                }
+                else
+                {
+                    TriggerObjectTrackerCycle(2, back: true); // IN_GROUP Up
+                }
+                return true;
+            }
+            if (e.Button == SButton.Subtract)
+            {
+                if (ctrlPressed)
+                {
+                    TriggerObjectTrackerCycle(1, back: false); // OBJECT_GROUP Down
+                }
+                else if (shiftPressed)
+                {
+                    TriggerObjectTrackerCycle(0, back: false); // CATEGORY Down
+                }
+                else
+                {
+                    TriggerObjectTrackerCycle(2, back: false); // IN_GROUP Down
+                }
+                return true;
+            }
 
             if (ctrlPressed)
             {
@@ -433,6 +497,94 @@ namespace StardewNavigator.Features.Navigator
                 StardewValley.Menus.AnimalQueryMenu => true,
                 _ => false
             };
+        }
+
+        private static bool IsNumLockActive()
+        {
+            try
+            {
+                if (OperatingSystem.IsWindows())
+                {
+                    return Console.NumberLock;
+                }
+                return true; // default a true su altre piattaforme (Linux/Mac)
+            }
+            catch
+            {
+                return true; // fallback sicuro se la piattaforma non lo supporta
+            }
+        }
+
+        private static object? GetObjectTrackerInstance()
+        {
+            try
+            {
+                var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "stardew-access");
+                if (assembly == null) return null;
+
+                var trackerType = assembly.GetType("stardew_access.Features.ObjectTracker");
+                if (trackerType == null) return null;
+
+                var instanceProp = trackerType.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                return instanceProp?.GetValue(null);
+            }
+            catch { return null; }
+        }
+
+        private static void TriggerObjectTrackerCycle(int cycleTypeVal, bool back)
+        {
+            var otInstance = GetObjectTrackerInstance();
+            if (otInstance == null) return;
+
+            try
+            {
+                var cycleType = otInstance.GetType().GetNestedType("CycleType", System.Reflection.BindingFlags.NonPublic);
+                if (cycleType == null) return;
+
+                var cycleVal = Enum.ToObject(cycleType, cycleTypeVal);
+                bool wrapAround = GetOTWrapLists();
+
+                var method = otInstance.GetType().GetMethod("Cycle", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                method?.Invoke(otInstance, new object[] { cycleVal, back, wrapAround });
+            }
+            catch { }
+        }
+
+        private static void TriggerObjectTrackerAction(string methodName, object[]? args = null)
+        {
+            var otInstance = GetObjectTrackerInstance();
+            if (otInstance == null) return;
+
+            try
+            {
+                var method = otInstance.GetType().GetMethod(methodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                method?.Invoke(otInstance, args);
+            }
+            catch { }
+        }
+
+        private static bool GetOTWrapLists()
+        {
+            try
+            {
+                var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "stardew-access");
+                if (assembly == null) return false;
+
+                var mainClassType = assembly.GetType("stardew_access.MainClass");
+                if (mainClassType == null) return false;
+
+                var configProp = mainClassType.GetProperty("Config", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+                    ?? (object?)mainClassType.GetField("Config", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic) as System.Reflection.MemberInfo;
+
+                object? configObj = null;
+                if (configProp is System.Reflection.PropertyInfo pInfo) configObj = pInfo.GetValue(null);
+                else if (configProp is System.Reflection.FieldInfo fInfo) configObj = fInfo.GetValue(null);
+
+                if (configObj == null) return false;
+                var wrapListsProp = configObj.GetType().GetProperty("OTWrapLists");
+                return (bool)(wrapListsProp?.GetValue(configObj) ?? false);
+            }
+            catch { return false; }
         }
     }
 }
