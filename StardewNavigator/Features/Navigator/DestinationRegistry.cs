@@ -49,9 +49,9 @@ namespace StardewNavigator.Features.Navigator
                 int totalPoi = _maps.Sum(m => m.PointsOfInterest.Count);
                 Log.Debug($"Caricate {_maps.Count} mappe, {totalPoi} punti di interesse per il navigatore.");
             }
-            catch (JsonException ex)
+            catch (Exception ex)
             {
-                Log.Error($"Errore parsing navigator_destinations.json: {ex.Message}");
+                Log.Error($"Errore nel caricamento o parsing di navigator_destinations.json: {ex.Message}");
                 _maps = new();
             }
         }

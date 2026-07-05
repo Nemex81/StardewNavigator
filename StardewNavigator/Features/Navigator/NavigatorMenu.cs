@@ -23,6 +23,8 @@ namespace StardewNavigator.Features.Navigator
         private MenuLevel _currentLevel = MenuLevel.Level1;
         private int _mapIndex;     // indice selezionato in Level1
         private int _poiIndex;     // indice selezionato in Level2
+        private int _lastMouseX = -1;
+        private int _lastMouseY = -1;
 
         // Dimensioni layout
         private const int ItemHeight = 56;
@@ -286,6 +288,95 @@ namespace StardewNavigator.Features.Navigator
             if (selectedIndex < MaxVisibleItems) return 0;
             int maxOffset = itemCount - MaxVisibleItems;
             return Math.Min(selectedIndex - MaxVisibleItems / 2, maxOffset);
+        }
+
+        public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
+        {
+            base.gameWindowSizeChanged(oldBounds, newBounds);
+            width = 600;
+            if (_currentLevel == MenuLevel.Level1)
+            {
+                ResizeForLevel1();
+            }
+            else
+            {
+                var poi = CurrentMap.PointsOfInterest;
+                ResizeForLevel2(poi.Count);
+            }
+            xPositionOnScreen = Game1.uiViewport.Width / 2 - width / 2;
+        }
+
+        public override void receiveLeftClick(int x, int y, bool playSound = true)
+        {
+            base.receiveLeftClick(x, y, playSound);
+
+            var items = GetCurrentItems();
+            int startY = yPositionOnScreen + MenuPadding + TitleHeight;
+            int currentIndex = _currentLevel == MenuLevel.Level1 ? _mapIndex : _poiIndex;
+            int scrollOffset = GetScrollOffset(currentIndex, items.Count);
+            int visibleCount = Math.Min(items.Count, MaxVisibleItems);
+
+            if (x >= xPositionOnScreen + MenuPadding && x <= xPositionOnScreen + width - MenuPadding)
+            {
+                if (y >= startY && y < startY + visibleCount * ItemHeight)
+                {
+                    int clickedIdx = ((y - startY) / ItemHeight) + scrollOffset;
+                    if (clickedIdx >= 0 && clickedIdx < items.Count)
+                    {
+                        if (_currentLevel == MenuLevel.Level1)
+                        {
+                            _mapIndex = clickedIdx;
+                        }
+                        else
+                        {
+                            _poiIndex = clickedIdx;
+                        }
+                        ConfirmSelection();
+                    }
+                }
+            }
+        }
+
+        public override void performHoverAction(int x, int y)
+        {
+            base.performHoverAction(x, y);
+
+            if (x == _lastMouseX && y == _lastMouseY) return;
+            _lastMouseX = x;
+            _lastMouseY = y;
+
+            var items = GetCurrentItems();
+            int startY = yPositionOnScreen + MenuPadding + TitleHeight;
+            int currentIndex = _currentLevel == MenuLevel.Level1 ? _mapIndex : _poiIndex;
+            int scrollOffset = GetScrollOffset(currentIndex, items.Count);
+            int visibleCount = Math.Min(items.Count, MaxVisibleItems);
+
+            if (x >= xPositionOnScreen + MenuPadding && x <= xPositionOnScreen + width - MenuPadding)
+            {
+                if (y >= startY && y < startY + visibleCount * ItemHeight)
+                {
+                    int hoveredIdx = ((y - startY) / ItemHeight) + scrollOffset;
+                    if (hoveredIdx >= 0 && hoveredIdx < items.Count)
+                    {
+                        if (_currentLevel == MenuLevel.Level1)
+                        {
+                            if (_mapIndex != hoveredIdx)
+                            {
+                                _mapIndex = hoveredIdx;
+                                _onSpeak(CurrentMap.MapDisplayName);
+                            }
+                        }
+                        else
+                        {
+                            if (_poiIndex != hoveredIdx)
+                            {
+                                _poiIndex = hoveredIdx;
+                                _onSpeak(CurrentMap.PointsOfInterest[_poiIndex].DisplayName);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
