@@ -20,8 +20,17 @@ namespace StardewNavigator.Features.Navigator
             if (!ModEntry.Config.NumpadControlsActive) return false;
             if (!Context.IsWorldReady) return false;
 
-            // 1. Esplorazione tramite Ctrl + Numpad (se stardew-access è attiva)
             bool ctrlPressed = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
+            bool isPlayerFree = Context.IsPlayerFree;
+            bool isInMenuBuilder = IsInMenuBuilderViewport();
+
+            // Blocca l'intercettazione se il giocatore non è libero (nei menu/chat/cutscene),
+            // a meno che non si stia usando Ctrl (esplorazione) all'interno di un menu di costruzione (es. CarpenterMenu).
+            if (!isPlayerFree && !(isInMenuBuilder && ctrlPressed))
+            {
+                return false;
+            }
+
             bool shiftPressed = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
 
             if (ctrlPressed)
@@ -412,6 +421,17 @@ namespace StardewNavigator.Features.Navigator
                 method?.Invoke(tvInstance, null);
             }
             catch { }
+        }
+
+        private static bool IsInMenuBuilderViewport()
+        {
+            return Game1.activeClickableMenu switch
+            {
+                StardewValley.Menus.CarpenterMenu => true,
+                StardewValley.Menus.PurchaseAnimalsMenu => true,
+                StardewValley.Menus.AnimalQueryMenu => true,
+                _ => false
+            };
         }
     }
 }
