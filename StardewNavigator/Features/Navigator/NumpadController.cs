@@ -257,7 +257,8 @@ namespace StardewNavigator.Features.Navigator
                 }
                 if (tf is StardewValley.TerrainFeatures.FruitTree fruitTree)
                 {
-                    return helper.Translation.Get("numpad-read-tile-fruit-tree", new { stage = fruitTree.growthStage.Value }).ToString();
+                    string ftName = fruitTree.GetDisplayName();
+                    return helper.Translation.Get("numpad-read-tile-fruit-tree-with-name", new { name = ftName, stage = fruitTree.growthStage.Value }).ToString();
                 }
                 if (tf is StardewValley.TerrainFeatures.Grass)
                 {
