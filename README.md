@@ -6,10 +6,14 @@ StardewNavigator is a standalone pathfinding and navigation mod for Stardew Vall
 
 - **Automatic Pathfinding**: Computes shortest-path routes across multiple maps using BFS.
 - **Dynamic Routing**: Adapts paths when you warp or change locations.
-- **Accessibility Integration**: If `Stardew Access` is installed, navigation instructions are read aloud via your screen reader.
+- **Numpad Navigation & Grid Movement**: Classic numeric keypad layout for manual movement, inspection, coordinates, menu, and scanner controls (active when `NumLock` is ON).
+- **stardew-access Reflection Bridge**: Direct, dynamic integration with `stardew-access`'s TileViewer cursor and Auto-Walk scanner features via numeric keypad.
+- **Mouse & Resize Support**: Recalculates menu layout on window resize, highlights items on hover, and allows click-to-confirm POI selections for sighted players.
+- **Accessibility Integration**: If `Stardew Access` is installed, navigation instructions and numpad inspects are read aloud via NVDA/SAPI.
 - **Visual Fallback**: If `Stardew Access` is not installed, temporary HUD messages are displayed on-screen.
 - **Customizable**:
   - Keybind to open the navigation menu (default: `G`).
+  - Toggle Numpad controls active/inactive in config (default: `true`).
   - Duration of on-screen HUD messages.
   - Fully compatible with Generic Mod Config Menu.
 
@@ -31,7 +35,28 @@ Opzionale: installa Stardew Access per integrazione screen reader completa.
 You can configure the mod via the `config.json` file generated in the mod folder after running the game once, or in-game via the **Generic Mod Config Menu**:
 
 - `NavigatorMenuKey`: The keybind used to open the navigation menu (default: `G`).
+- `NumpadControlsActive`: Toggle the Numpad navigation shortcut controls (default: `true`).
 - `HudMessageDuration`: The time (in seconds) that on-screen fallback messages remain visible (default: `4.0` seconds).
+
+## Numpad Controls (NumLock ON)
+
+When **NumLock is ON**, the numeric keypad acts as the StardewNavigator interface:
+- **`8, 2, 4, 6`**: Move grid up, down, left, right.
+- **`5`**: Read tile in front of the player (facing tile).
+- **`LeftAlt + 5`**: Read tile player is standing on.
+- **`7`**: Read current coordinates and location display name.
+- **`9`**: Open Navigator Menu.
+- **`1`**: Read active navigation route status.
+- **`3`**: Cancel active navigation.
+- **`Ctrl + 8, 2, 4, 6`**: Move `stardew-access` TileViewer cursor.
+- **`Ctrl + 0`**: Trigger Auto-Walk to the TileViewer cursor.
+- **`/` (Divide)**: Read currently selected scanner object.
+- **`Ctrl + /`**: Move to currently selected scanner object (Auto-Walk).
+- **`*` (Multiply)**: Read selected scanner object tile location.
+- **`+` (Add)**: Cycle upwards (Item without modifier, Group with `Ctrl`, Category with `Shift`).
+- **`-` (Subtract)**: Cycle downwards (Item without modifier, Group with `Ctrl`, Category with `Shift`).
+
+When **NumLock is OFF**, the keys behave as standard keyboard navigation keys. Numpad keys are also ignored during chat typing or in menus to avoid layout conflicts.
 
 ## Credits & Acknowledgements
 Questo mod è un'estrazione standalone del modulo Navigator sviluppato 
@@ -44,3 +69,11 @@ e proposto tramite PR #549:
 
 Ringraziamenti speciali al team di stardew-access, a Pathoschild
 per SMAPI e ModBuildConfig, e alla community di modding di Stardew Valley.
+
+## Changelog
+
+### v1.1.0
+- **Numpad Controls**: Added comprehensive keypad-driven layout for manual movement, inspection, coordinates, menu, and scanner controls (active when `NumLock` is ON).
+- **stardew-access Bridge**: Added reflection bridge to support `stardew-access` TileViewer exploration cursor and Auto-Walk scanner functionality.
+- **Usability Enhancements**: Added full mouse click support, hover state detection, and dynamic menu resizing for `NavigatorMenu`.
+- **Stability Improvement**: Wrapped JSON file reading in a generic try-catch block to prevent game startup crashes if files are locked.
