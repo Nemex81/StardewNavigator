@@ -119,6 +119,14 @@ namespace StardewNavigator
                     getValue: () => Config.CheckForUpdatesOnStartup,
                     setValue: value => Config.CheckForUpdatesOnStartup = value
                 );
+
+                configMenu.AddBoolOption(
+                    mod: ModManifest,
+                    name: () => Helper.Translation.Get("config.numpad-active.name"),
+                    tooltip: () => Helper.Translation.Get("config.numpad-active.tooltip"),
+                    getValue: () => Config.NumpadControlsActive,
+                    setValue: value => Config.NumpadControlsActive = value
+                );
             }
         }
     }

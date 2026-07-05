@@ -14,5 +14,8 @@ namespace StardewNavigator
 
         // Controlla la presenza di aggiornamenti all'avvio
         public bool CheckForUpdatesOnStartup { get; set; } = true;
+
+        // Abilita i controlli tramite tastierino numerico (Numpad)
+        public bool NumpadControlsActive { get; set; } = true;
     }
 }

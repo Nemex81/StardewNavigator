@@ -70,6 +70,10 @@ namespace StardewNavigator.Features.Navigator
 
         public bool IsActive => _state != State.Idle;
 
+        public string PoiDisplayName => _poiDisplayName;
+        public string MapDisplayName => _mapDisplayName;
+        public int RemainingSteps => _phaseARoute == null ? 0 : (_phaseARoute.Count - _currentStepIndex);
+
         public Navigator()
         {
         }

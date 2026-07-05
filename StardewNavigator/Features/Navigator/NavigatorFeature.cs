@@ -14,10 +14,12 @@ namespace StardewNavigator.Features.Navigator
         private readonly RouteEngine _routeEngine;
         private readonly Navigator _navigator;
         private readonly DestinationRegistry _destinationRegistry;
+        private readonly IModHelper _helper;
 
         public NavigatorFeature(IModHelper helper)
         {
             Instance = this;
+            _helper = helper;
 
             _routeEngine = new RouteEngine();
             _navigator = new Navigator();
@@ -78,6 +80,13 @@ namespace StardewNavigator.Features.Navigator
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady) return;
+
+            // Intercetta e gestisce i tasti del tastierino numerico (Numpad)
+            if (NumpadController.HandleButton(e, _navigator, _destinationRegistry, _routeEngine))
+            {
+                _helper.Input.Suppress(e.Button);
+                return;
+            }
 
             // Se la navigazione è attiva, intercetta i tasti di movimento manuali per annullare
             if (_navigator.IsActive)
