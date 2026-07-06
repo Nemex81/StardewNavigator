@@ -61,6 +61,7 @@ namespace StardewNavigator.Features.Navigator
         /// </summary>
         public void ResolveCoordinates(RouteEngine routeEngine)
         {
+            Load(); // Ricarica le destinazioni originali con le chiavi pulite per prevenire doppie traduzioni (specialmente in coop/ricaricamenti)
             int resolvedCount = 0;
             int failedCount = 0;
 
