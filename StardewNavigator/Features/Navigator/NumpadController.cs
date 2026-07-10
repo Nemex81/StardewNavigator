@@ -230,6 +230,16 @@ namespace StardewNavigator.Features.Navigator
             bool isPlayerFree = Context.IsPlayerFree;
             bool isInMenuBuilder = IsInMenuBuilderViewport();
 
+            // ─── NumPad Decimal (.) = alias di Enter in qualsiasi contesto ──────────────────────
+            // Inserito PRIMA di qualsiasi blocco menu/guard: funziona nel mondo, nell'inventario,
+            // nel NavigatorMenu e in qualsiasi altro menu. Non richiede modificatori.
+            // SButton.Decimal (110) = '.' del tastierino numerico; diverso da OemPeriod (190).
+            if (e.Button == SButton.Decimal)
+            {
+                ModEntry.Helper.Input.Press(SButton.Enter); // '.' numpad ≡ Enter in tutti i contesti
+                return true;
+            }
+
             // ─── Gestione tasti numerici quando il NavigatorMenu di StardewNavigator è aperto ──
             // Questo blocco è eseguito PRIMA della guardia !isPlayerFree, poiché il menu
             // blocca Context.IsPlayerFree. Intercetta solo i tasti pertinenti al menu.
@@ -431,19 +441,13 @@ namespace StardewNavigator.Features.Navigator
 
                 if (e.Button == SButton.NumPad1)
                 {
-                    // NumPad1 = usa attrezzo (≡ X in stardew-access)
-                    // Con stardew-access: simula SButton.X tramite il sistema di input nativo,
-                    // che ha già il rate limiting integrato nel loop XNA (un evento per frame fisico).
-                    // Senza stardew-access: cooldown manuale a ticks per prevenire attivazioni a raffica.
+                    // NumPad1 = usa attrezzo (≡ X) — valido per tutti i giocatori,
+                    // con e senza stardew-access, con e senza screen reader.
+                    // Il cooldown (20 ticks ≈ 333ms a 60 FPS) impedisce attivazioni a raffica
+                    // replicando la cadenza naturale di una singola oscillazione dell'attrezzo.
                     int currentTick = Game1.ticks;
-                    if (GetObjectTrackerInstance() != null)
+                    if (currentTick - _lastUseToolTick >= UseToolCooldownTicks)
                     {
-                        // stardew-access presente: delega al sistema nativo tramite simulazione SButton.X
-                        ModEntry.Helper.Input.Press(SButton.X);
-                    }
-                    else if (currentTick - _lastUseToolTick >= UseToolCooldownTicks)
-                    {
-                        // Fallback standalone con cooldown
                         _lastUseToolTick = currentTick;
                         Game1.pressUseToolButton();
                     }

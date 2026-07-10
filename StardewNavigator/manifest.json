@@ -1,7 +1,7 @@
 {
   "Name": "Stardew Navigator",
   "Author": "Nemex81",
-  "Version": "1.2.7",
+  "Version": "1.2.8",
   "Description": "An automatic pathfinding and navigation mod for Stardew Valley that guides players to points of interest with audio/screen reader speech and on-screen HUD fallback messages.",
   "UniqueID": "Nemex81.StardewNavigator",
   "EntryDll": "StardewNavigator.dll",

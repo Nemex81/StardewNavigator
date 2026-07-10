@@ -2,7 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.8] - 2026-07-10
+
+### Fixed
+- **NumPad1 (use tool)**: removed the stardew-access-specific `Input.Press(SButton.X)` path that caused unexpected behavior. `NumPad1` now calls `Game1.pressUseToolButton()` directly with a 20-tick cooldown for **all players** (with or without stardew-access, sighted or screen-reader users). This correctly triggers tool use (axe, hoe, fishing rod, sword, etc.) without rapid-fire.
+
+### Added
+- **NumPad Decimal (`.` on numpad) = alias of Enter in all contexts**: pressing the numpad decimal point (`.`) simulates `Enter` in any context — world, inventory, Navigator Menu, and any other open menu. The handler is placed before all guard conditions so it is never blocked. No conflict with the main keyboard period key (`OemPeriod`, which is a different SButton value).
+
+---
+
 ## [1.2.7] - 2026-07-10
+
 
 ### Fixed
 - **NumPad3 (interact/action) — chests and interactive objects**: replaced `pressActionButton` with a direct call to `location.checkAction()` on the tile in front of the player, mirroring the approach used by `stardew-access` in `GridMovement.cs`. This correctly triggers interactions with chests, NPCs, signs, machines, and all other tile-based interactive objects. A fallback to `pressActionButton` (using the raw XNA `GetKeyboardState()`) handles edge cases such as festival events and special doors.
