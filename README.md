@@ -40,6 +40,9 @@ You can configure the mod via the `config.json` file generated in the mod folder
 
 ## Numpad Controls (NumLock ON)
 
+> [!NOTE]
+> For a fully detailed map, including all modifier layers, scanner interactions, and emulation details, please read the complete [Numpad Mapping Documentation](NUMPAD_MAP.md).
+
 When **NumLock is ON**, the numeric keypad acts as a layered interface for movement, cursors, actions, and readings:
 
 ### 1. Base Level (No Modifiers)
