@@ -56,7 +56,7 @@ When **NumLock is ON**, the numeric keypad acts as a layered interface for movem
 
 ### 2. LeftCtrl Level (Character Physics & Actions)
 - **`LeftCtrl + 8, 2, 4, 6`**: Micro-movement precise (player walks fluidly pixel-per-pixel).
-- **`LeftCtrl + 5`**: Trigger Auto-Walk to the TileViewer cursor (equivalent to `LeftCtrl + Home`).
+- **`LeftCtrl + 5`**: Trigger Auto-Walk to the Object Tracker selected object (equivalent to `LeftCtrl + Home`).
 - **`LeftCtrl + 9`**: Cancel active navigation.
 - **`LeftCtrl + 0`**: Alias of `LeftCtrl + Enter` (simulates Left Click in menus / Carpenter construction, and triggers Auto-Walk in the world).
 
@@ -92,6 +92,9 @@ Ringraziamenti speciali al team di stardew-access, a Pathoschild
 per SMAPI e ModBuildConfig, e alla community di modding di Stardew Valley.
 
 ## Changelog
+
+### v1.2.4
+- **Object Tracker Auto-Walk**: Remapped `LeftCtrl + NumPad5` to trigger Auto-Walk directly to the Object Tracker selected object (equivalent to `LeftCtrl + Home`), separating it from `LeftCtrl + NumPad0` which remains the TileViewer cursor Auto-Walk (equivalent to `LeftCtrl + Enter`).
 
 ### v1.2.3
 - **Alias LeftCtrl + Enter**: Reassigned `LeftCtrl + NumPad0` to act as a virtual key press of `Enter` while `LeftCtrl` is held. This makes `LeftCtrl + NumPad0` a true alias of `LeftCtrl + Enter`, triggering Auto-Walk in the world and simulating Left Click in menus (like chest slot confirmation or Carpenter construction).

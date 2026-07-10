@@ -323,7 +323,7 @@ namespace StardewNavigator.Features.Navigator
                 }
                 if (e.Button == SButton.NumPad5)
                 {
-                    TriggerAutoWalk(); // Ctrl + 5 = Auto-Walk al cursore TileViewer (≡ LeftCtrl + Home)
+                    TriggerObjectTrackerAction("MoveToCurrentlySelectedObject"); // Ctrl + 5 = Auto-Walk all'oggetto selezionato dell'Object Tracker (≡ LeftCtrl + Home)
                     return true;
                 }
                 if (e.Button == SButton.NumPad9)

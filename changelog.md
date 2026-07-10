@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.4] - 2026-07-10
+
+### Added
+- **Object Tracker Auto-Walk**: Remapped `LeftCtrl + NumPad5` to invoke `MoveToCurrentlySelectedObject` on the `ObjectTracker` instance (equivalent to `LeftCtrl + Home`).
+  - Separates it from the TileViewer cursor Auto-Walk (equivalent to `LeftCtrl + Enter` / `LeftCtrl + NumPad0`).
+
 ## [1.2.3] - 2026-07-10
 
 ### Added
