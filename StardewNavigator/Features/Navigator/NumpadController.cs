@@ -17,21 +17,38 @@ namespace StardewNavigator.Features.Navigator
         private static long _keyPressStartTick = 0;
         private static bool _useFallbackMovement = false;
 
-        private static SButton _activeMicroMovementKey = SButton.None;
-        private static int _activeMicroMovementDirection = -1;
-
         private static SButton _activeCursorKey = SButton.None;
         private static Vector2 _activeCursorDelta = Vector2.Zero;
         private static long _lastCursorStepTick = 0;
 
-        private static void ResetMicroMovement()
+        public static void AddNumpadToGameOptions()
         {
-            if (_activeMicroMovementKey != SButton.None)
+            try
             {
-                Game1.player?.Halt();
-                _activeMicroMovementKey = SButton.None;
-                _activeMicroMovementDirection = -1;
+                Game1.options.moveUpButton = AddKeyToOptionArray(Game1.options.moveUpButton, Microsoft.Xna.Framework.Input.Keys.NumPad8);
+                Game1.options.moveRightButton = AddKeyToOptionArray(Game1.options.moveRightButton, Microsoft.Xna.Framework.Input.Keys.NumPad6);
+                Game1.options.moveDownButton = AddKeyToOptionArray(Game1.options.moveDownButton, Microsoft.Xna.Framework.Input.Keys.NumPad2);
+                Game1.options.moveLeftButton = AddKeyToOptionArray(Game1.options.moveLeftButton, Microsoft.Xna.Framework.Input.Keys.NumPad4);
             }
+            catch (Exception ex)
+            {
+                Log.Error($"[StardewNavigator] Errore nell'aggiunta dei tasti Numpad alle opzioni di gioco: {ex.Message}");
+            }
+        }
+
+        private static InputButton[] AddKeyToOptionArray(InputButton[] currentArray, Microsoft.Xna.Framework.Input.Keys key)
+        {
+            var button = new InputButton(key);
+            if (currentArray == null)
+            {
+                return new InputButton[] { button };
+            }
+            if (currentArray.Contains(button)) return currentArray;
+
+            var newArray = new InputButton[currentArray.Length + 1];
+            currentArray.CopyTo(newArray, 0);
+            newArray[currentArray.Length] = button;
+            return newArray;
         }
 
         private static void ResetCursorMovement()
@@ -93,31 +110,6 @@ namespace StardewNavigator.Features.Navigator
             if (!ModEntry.Config.NumpadControlsActive) return;
             if (!IsNumLockActive()) return;
             if (!Context.IsWorldReady) return;
-
-            // 1. Gestione Micro-movimento (LeftCtrl)
-            if (_activeMicroMovementKey != SButton.None)
-            {
-                bool ctrlPressed = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
-                if (!Context.IsPlayerFree || !ModEntry.Helper.Input.IsDown(_activeMicroMovementKey) || !ctrlPressed)
-                {
-                    ResetMicroMovement();
-                }
-                else
-                {
-                    Farmer player = Game1.player;
-                    if (player != null)
-                    {
-                        switch (_activeMicroMovementDirection)
-                        {
-                            case 0: player.SetMovingUp(true); break;
-                            case 1: player.SetMovingRight(true); break;
-                            case 2: player.SetMovingDown(true); break;
-                            case 3: player.SetMovingLeft(true); break;
-                        }
-                        player.faceDirection(_activeMicroMovementDirection);
-                    }
-                }
-            }
 
             // 2. Gestione Repeat Cursore (LeftShift)
             if (_activeCursorKey != SButton.None)
@@ -336,25 +328,11 @@ namespace StardewNavigator.Features.Navigator
             {
                 if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4 || e.Button == SButton.NumPad6)
                 {
-                    int dir = e.Button switch
+                    if (navigator.IsActive)
                     {
-                        SButton.NumPad8 => 0,
-                        SButton.NumPad6 => 1,
-                        SButton.NumPad2 => 2,
-                        SButton.NumPad4 => 3,
-                        _ => -1
-                    };
-
-                    if (dir >= 0)
-                    {
-                        if (navigator.IsActive)
-                        {
-                            navigator.CancelNavigation("input movimento manuale");
-                        }
-                        _activeMicroMovementKey = e.Button;
-                        _activeMicroMovementDirection = dir;
-                        return true;
+                        navigator.CancelNavigation("input movimento manuale");
                     }
+                    return false; // Non sopprimiamo, lasciamo passare il tasto per il movimento nativo
                 }
                 if (e.Button == SButton.NumPad5)
                 {

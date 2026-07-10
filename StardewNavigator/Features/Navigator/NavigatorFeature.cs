@@ -123,6 +123,9 @@ namespace StardewNavigator.Features.Navigator
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
+            // Associa i tasti Numpad alle opzioni di movimento di gioco per il micro-movimento
+            NumpadController.AddNumpadToGameOptions();
+
             // Ricostruisce il grafo al caricamento del salvataggio
             _routeEngine.BuildGraph();
             _destinationRegistry.ResolveCoordinates(_routeEngine);
