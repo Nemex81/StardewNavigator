@@ -254,15 +254,15 @@ namespace StardewNavigator.Features.Navigator
             {
                 if (ctrlPressed)
                 {
-                    TriggerObjectTrackerCycle(1, back: true); // OBJECT_GROUP Up
+                    TriggerObjectTrackerCycle(0, back: true); // CATEGORY Up (corresponds to Ctrl + PageUp)
                 }
                 else if (shiftPressed)
                 {
-                    TriggerObjectTrackerCycle(0, back: true); // CATEGORY Up
+                    TriggerObjectTrackerCycle(2, back: true); // IN_GROUP Up (corresponds to Shift + PageUp)
                 }
                 else
                 {
-                    TriggerObjectTrackerCycle(2, back: true); // IN_GROUP Up
+                    TriggerObjectTrackerCycle(1, back: true); // OBJECT_GROUP Up (corresponds to PageUp)
                 }
                 return true;
             }
@@ -270,15 +270,15 @@ namespace StardewNavigator.Features.Navigator
             {
                 if (ctrlPressed)
                 {
-                    TriggerObjectTrackerCycle(1, back: false); // OBJECT_GROUP Down
+                    TriggerObjectTrackerCycle(0, back: false); // CATEGORY Down (corresponds to Ctrl + PageDown)
                 }
                 else if (shiftPressed)
                 {
-                    TriggerObjectTrackerCycle(0, back: false); // CATEGORY Down
+                    TriggerObjectTrackerCycle(2, back: false); // IN_GROUP Down (corresponds to Shift + PageDown)
                 }
                 else
                 {
-                    TriggerObjectTrackerCycle(2, back: false); // IN_GROUP Down
+                    TriggerObjectTrackerCycle(1, back: false); // OBJECT_GROUP Down (corresponds to PageDown)
                 }
                 return true;
             }

@@ -68,8 +68,8 @@ When **NumLock is ON**, the numeric keypad acts as a layered interface for movem
 - **`/` (Divide)**: Read currently selected scanner object.
 - **`Ctrl + /`**: Move to currently selected scanner object (Auto-Walk).
 - **`*` (Multiply)**: Read selected scanner object tile location.
-- **`+` (Add)**: Cycle upwards (Item without modifier, Group with `Ctrl`, Category with `Shift`).
-- **`-` (Subtract)**: Cycle downwards (Item without modifier, Group with `Ctrl`, Category with `Shift`).
+- **`+` (Add)**: Cycle upwards (Group without modifier, Category with `Ctrl`, Item in group with `Shift`).
+- **`-` (Subtract)**: Cycle downwards (Group without modifier, Category with `Ctrl`, Item in group with `Shift`).
 
 When **NumLock is OFF**, the keys behave as standard keyboard navigation keys. Numpad keys are also ignored during chat typing or in menus to avoid layout conflicts.
 
