@@ -17,6 +17,30 @@ namespace StardewNavigator.Features.Navigator
         private static long _keyPressStartTick = 0;
         private static bool _useFallbackMovement = false;
 
+        private static SButton _activeMicroMovementKey = SButton.None;
+        private static int _activeMicroMovementDirection = -1;
+
+        private static SButton _activeCursorKey = SButton.None;
+        private static Vector2 _activeCursorDelta = Vector2.Zero;
+        private static long _lastCursorStepTick = 0;
+
+        private static void ResetMicroMovement()
+        {
+            if (_activeMicroMovementKey != SButton.None)
+            {
+                Game1.player?.Halt();
+                _activeMicroMovementKey = SButton.None;
+                _activeMicroMovementDirection = -1;
+            }
+        }
+
+        private static void ResetCursorMovement()
+        {
+            _activeCursorKey = SButton.None;
+            _activeCursorDelta = Vector2.Zero;
+            _lastCursorStepTick = 0;
+        }
+
         private static object? GetGridMovementInstance()
         {
             try
@@ -70,6 +94,51 @@ namespace StardewNavigator.Features.Navigator
             if (!IsNumLockActive()) return;
             if (!Context.IsWorldReady) return;
 
+            // 1. Gestione Micro-movimento (LeftCtrl)
+            if (_activeMicroMovementKey != SButton.None)
+            {
+                bool ctrlPressed = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
+                if (!Context.IsPlayerFree || !ModEntry.Helper.Input.IsDown(_activeMicroMovementKey) || !ctrlPressed)
+                {
+                    ResetMicroMovement();
+                }
+                else
+                {
+                    Farmer player = Game1.player;
+                    if (player != null)
+                    {
+                        switch (_activeMicroMovementDirection)
+                        {
+                            case 0: player.SetMovingUp(true); break;
+                            case 1: player.SetMovingRight(true); break;
+                            case 2: player.SetMovingDown(true); break;
+                            case 3: player.SetMovingLeft(true); break;
+                        }
+                        player.faceDirection(_activeMicroMovementDirection);
+                    }
+                }
+            }
+
+            // 2. Gestione Repeat Cursore (LeftShift)
+            if (_activeCursorKey != SButton.None)
+            {
+                bool shiftPressed = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
+                if (!Context.IsPlayerFree || !ModEntry.Helper.Input.IsDown(_activeCursorKey) || !shiftPressed)
+                {
+                    ResetCursorMovement();
+                }
+                else
+                {
+                    long currentTick = Game1.ticks;
+                    if (currentTick - _lastCursorStepTick >= 12) // 200ms
+                    {
+                        MoveTileViewerCursor(_activeCursorDelta, false);
+                        _lastCursorStepTick = currentTick;
+                    }
+                }
+            }
+
+            // 3. Gestione Movimento Griglia Base
             if (_activeDirectionKey == SButton.None) return;
 
             // Se il tasto non è più premuto, resettiamo
@@ -86,16 +155,17 @@ namespace StardewNavigator.Features.Navigator
                 return;
             }
 
-            // Se viene premuto Ctrl (modalità TileViewer cursor), interrompiamo il movimento continuo della griglia
-            bool ctrlPressed = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
-            if (ctrlPressed)
+            // Se viene premuto Ctrl o Shift, interrompiamo il movimento continuo locale a griglia
+            bool ctrlPressedNow = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
+            bool shiftPressedNow = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
+            if (ctrlPressedNow || shiftPressedNow)
             {
                 ResetMovement();
                 return;
             }
 
-            long currentTick = Game1.ticks;
-            long elapsedTicks = currentTick - _keyPressStartTick;
+            long currentTickBase = Game1.ticks;
+            long elapsedTicks = currentTickBase - _keyPressStartTick;
 
             // Ritardo iniziale per la ripetizione (circa 400ms = 24 tick a 60fps)
             const int initialDelayTicks = 24;
@@ -105,15 +175,14 @@ namespace StardewNavigator.Features.Navigator
             }
 
             // Calcolo dell'intervallo di ripetizione dinamico basato sulla velocità del giocatore.
-            // A velocità standard (4.6), desideriamo circa 200ms = 12 tick.
             float speed = Game1.player.getMovementSpeed();
             if (speed <= 0) speed = 4.6f;
             int repeatIntervalTicks = (int)Math.Max(5, Math.Round(55f / speed));
 
-            if (currentTick - _lastStepTick >= repeatIntervalTicks)
+            if (currentTickBase - _lastStepTick >= repeatIntervalTicks)
             {
                 MoveGrid(_activeDirection);
-                _lastStepTick = currentTick;
+                _lastStepTick = currentTickBase;
             }
         }
 
@@ -159,17 +228,17 @@ namespace StardewNavigator.Features.Navigator
             }
 
             bool ctrlPressed = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
+            bool shiftPressed = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
+            bool altPressed = ModEntry.Helper.Input.IsDown(SButton.LeftAlt) || ModEntry.Helper.Input.IsDown(SButton.RightAlt);
             bool isPlayerFree = Context.IsPlayerFree;
             bool isInMenuBuilder = IsInMenuBuilderViewport();
 
             // Blocca l'intercettazione se il giocatore non è libero (nei menu/chat/cutscene),
-            // a meno che non si stia usando Ctrl (esplorazione) all'interno di un menu di costruzione (es. CarpenterMenu).
-            if (!isPlayerFree && !(isInMenuBuilder && ctrlPressed))
+            // a meno che non si stia usando Ctrl o Shift (esplorazione) all'interno di un menu di costruzione (es. CarpenterMenu).
+            if (!isPlayerFree && !(isInMenuBuilder && (ctrlPressed || shiftPressed)))
             {
                 return false;
             }
-
-            bool shiftPressed = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
 
             // 1. Comandi dello Scanner (Object Tracker) tramite tasti matematici
             if (e.Button == SButton.Divide)
@@ -222,37 +291,95 @@ namespace StardewNavigator.Features.Navigator
                 return true;
             }
 
-            if (ctrlPressed)
+            // 2. Livello LeftShift (Cursore TileViewer ed esplorazione spaziale)
+            if (shiftPressed)
             {
-                if (e.Button == SButton.NumPad8)
+                if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4 || e.Button == SButton.NumPad6)
                 {
-                    MoveTileViewerCursor(new Vector2(0, shiftPressed ? -4 : -64), shiftPressed);
+                    Vector2 delta = e.Button switch
+                    {
+                        SButton.NumPad8 => new Vector2(0, -64),
+                        SButton.NumPad2 => new Vector2(0, 64),
+                        SButton.NumPad4 => new Vector2(-64, 0),
+                        SButton.NumPad6 => new Vector2(64, 0),
+                        _ => Vector2.Zero
+                    };
+
+                    if (delta != Vector2.Zero)
+                    {
+                        _activeCursorKey = e.Button;
+                        _activeCursorDelta = delta;
+                        _lastCursorStepTick = Game1.ticks;
+                        MoveTileViewerCursor(delta, false);
+                        return true;
+                    }
+                }
+                if (e.Button == SButton.NumPad5)
+                {
+                    ReadCoords(); // Shift + 5 = Leggi coordinate / posizione
                     return true;
                 }
-                if (e.Button == SButton.NumPad2)
+                if (e.Button == SButton.NumPad9)
                 {
-                    MoveTileViewerCursor(new Vector2(0, shiftPressed ? 4 : 64), shiftPressed);
-                    return true;
-                }
-                if (e.Button == SButton.NumPad4)
-                {
-                    MoveTileViewerCursor(new Vector2(shiftPressed ? -4 : -64, 0), shiftPressed);
-                    return true;
-                }
-                if (e.Button == SButton.NumPad6)
-                {
-                    MoveTileViewerCursor(new Vector2(shiftPressed ? 4 : 64, 0), shiftPressed);
+                    ReadNavStatus(navigator); // Shift + 9 = Stato navigazione
                     return true;
                 }
                 if (e.Button == SButton.NumPad0)
                 {
-                    TriggerAutoWalk();
+                    TriggerAutoWalk(); // Shift + 0 = Auto-Walk al cursore TileViewer
                     return true;
                 }
             }
 
-            // 2. Comandi standard del Numpad (senza Ctrl)
-            if (!ctrlPressed)
+            // 3. Livello LeftCtrl (Micro-movimento preciso ed esplorazione fisica)
+            else if (ctrlPressed)
+            {
+                if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4 || e.Button == SButton.NumPad6)
+                {
+                    int dir = e.Button switch
+                    {
+                        SButton.NumPad8 => 0,
+                        SButton.NumPad6 => 1,
+                        SButton.NumPad2 => 2,
+                        SButton.NumPad4 => 3,
+                        _ => -1
+                    };
+
+                    if (dir >= 0)
+                    {
+                        if (navigator.IsActive)
+                        {
+                            navigator.CancelNavigation("input movimento manuale");
+                        }
+                        _activeMicroMovementKey = e.Button;
+                        _activeMicroMovementDirection = dir;
+                        return true;
+                    }
+                }
+                if (e.Button == SButton.NumPad5)
+                {
+                    ReadTile(true); // Ctrl + 5 = Leggi tile sotto i piedi
+                    return true;
+                }
+                if (e.Button == SButton.NumPad9)
+                {
+                    CancelNav(navigator); // Ctrl + 9 = Annulla navigazione
+                    return true;
+                }
+            }
+
+            // 4. Livello LeftAlt (Stato vitale del personaggio)
+            else if (altPressed)
+            {
+                if (e.Button == SButton.NumPad5)
+                {
+                    ReadHealthAndStamina(); // Alt + 5 = Leggi salute / energia
+                    return true;
+                }
+            }
+
+            // 5. Livello Base (Nessun modificatore)
+            else
             {
                 if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad6 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4)
                 {
@@ -274,7 +401,7 @@ namespace StardewNavigator.Features.Navigator
                     {
                         if (TryDelegateGridMovement(dir, e.Button))
                         {
-                            ResetMovement(); // resetta eventuale movimento continuo locale per evitare conflitti
+                            ResetMovement();
                             return true;
                         }
 
@@ -282,33 +409,34 @@ namespace StardewNavigator.Features.Navigator
                         return true;
                     }
                 }
-            }
 
-            if (e.Button == SButton.NumPad5)
-            {
-                bool altPressed = ModEntry.Helper.Input.IsDown(SButton.LeftAlt) || ModEntry.Helper.Input.IsDown(SButton.RightAlt);
-                ReadTile(altPressed);
-                return true;
-            }
-            if (e.Button == SButton.NumPad7)
-            {
-                ReadCoords();
-                return true;
-            }
-            if (e.Button == SButton.NumPad9)
-            {
-                OpenMenu(registry, navigator, routeEngine);
-                return true;
-            }
-            if (e.Button == SButton.NumPad1)
-            {
-                ReadNavStatus(navigator);
-                return true;
-            }
-            if (e.Button == SButton.NumPad3)
-            {
-                CancelNav(navigator);
-                return true;
+                if (e.Button == SButton.NumPad1)
+                {
+                    // Numpad1 = usa attrezzo (X)
+                    Game1.pressUseToolButton();
+                    return true;
+                }
+                if (e.Button == SButton.NumPad3)
+                {
+                    // Numpad3 = azione / interazione (C)
+                    Game1.pressActionButton(Game1.input.GetKeyboardState(), Game1.input.GetMouseState(), Game1.input.GetGamePadState());
+                    return true;
+                }
+                if (e.Button == SButton.NumPad5)
+                {
+                    ReadTile(false); // Numpad5 = leggi tile di fronte
+                    return true;
+                }
+                if (e.Button == SButton.NumPad7)
+                {
+                    ReadCoords(); // Numpad7 = leggi coordinate (K) come fallback o tasto base alternativo
+                    return true;
+                }
+                if (e.Button == SButton.NumPad9)
+                {
+                    OpenMenu(registry, navigator, routeEngine); // Numpad9 = menu navigatore
+                    return true;
+                }
             }
 
             return false;
@@ -722,6 +850,19 @@ namespace StardewNavigator.Features.Navigator
                 return (bool)(wrapListsProp?.GetValue(configObj) ?? false);
             }
             catch { return false; }
+        }
+
+        private static void ReadHealthAndStamina()
+        {
+            if (!Context.IsWorldReady) return;
+            Farmer player = Game1.player;
+            if (player == null) return;
+
+            int healthPercent = player.maxHealth > 0 ? (int)Math.Round((double)player.health / player.maxHealth * 100) : 0;
+            int staminaPercent = player.MaxStamina > 0 ? (int)Math.Round((double)player.Stamina / player.MaxStamina * 100) : 0;
+
+            string text = ModEntry.Helper.Translation.Get("numpad-health-stamina", new { health = healthPercent, stamina = staminaPercent }).ToString();
+            NavigatorSpeaker.Say(text, true);
         }
     }
 }

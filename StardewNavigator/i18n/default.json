@@ -79,5 +79,6 @@
   "numpad-read-tile-tree-type-2": "Maple",
   "numpad-read-tile-tree-type-3": "Pine",
   "numpad-read-tile-tree-type-6": "Mahogany",
-  "numpad-read-tile-fruit-tree-with-name": "{{name}} Fruit Tree (stage {{stage}})"
+  "numpad-read-tile-fruit-tree-with-name": "{{name}} Fruit Tree (stage {{stage}})",
+  "numpad-health-stamina": "Health: {{health}}%, Stamina: {{stamina}}%"
 }

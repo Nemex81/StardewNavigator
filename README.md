@@ -40,16 +40,31 @@ You can configure the mod via the `config.json` file generated in the mod folder
 
 ## Numpad Controls (NumLock ON)
 
-When **NumLock is ON**, the numeric keypad acts as the StardewNavigator interface:
-- **`8, 2, 4, 6`**: Move grid up, down, left, right.
+When **NumLock is ON**, the numeric keypad acts as a layered interface for movement, cursors, actions, and readings:
+
+### 1. Base Level (No Modifiers)
+- **`8, 2, 4, 6`**: Move grid up, down, left, right (delegates to `stardew-access` if available, otherwise fallback locale).
+- **`1`**: Use Tool (`X` key mirror).
+- **`3`**: Action / Interact / Check (`C` key mirror).
 - **`5`**: Read tile in front of the player (facing tile).
-- **`LeftAlt + 5`**: Read tile player is standing on.
 - **`7`**: Read current coordinates and location display name.
 - **`9`**: Open Navigator Menu.
-- **`1`**: Read active navigation route status.
-- **`3`**: Cancel active navigation.
-- **`Ctrl + 8, 2, 4, 6`**: Move `stardew-access` TileViewer cursor.
-- **`Ctrl + 0`**: Trigger Auto-Walk to the TileViewer cursor.
+
+### 2. LeftCtrl Level (Character Physics & Actions)
+- **`LeftCtrl + 8, 2, 4, 6`**: Micro-movement precise (player walks fluidly pixel-per-pixel).
+- **`LeftCtrl + 5`**: Read tile player is standing on.
+- **`LeftCtrl + 9`**: Cancel active navigation.
+
+### 3. LeftShift Level (Tile Cursor & Navigation)
+- **`LeftShift + 8, 2, 4, 6`**: Move `stardew-access` TileViewer cursor.
+- **`LeftShift + 5`**: Read current coordinates and location display name.
+- **`LeftShift + 9`**: Read active navigation route status.
+- **`LeftShift + 0`**: Trigger Auto-Walk to the TileViewer cursor.
+
+### 4. LeftAlt Level (Player Vitals)
+- **`LeftAlt + 5`**: Read player health and stamina.
+
+### 5. Scanner Controls ( Matematics keys, unmodified by Shift/Ctrl)
 - **`/` (Divide)**: Read currently selected scanner object.
 - **`Ctrl + /`**: Move to currently selected scanner object (Auto-Walk).
 - **`*` (Multiply)**: Read selected scanner object tile location.

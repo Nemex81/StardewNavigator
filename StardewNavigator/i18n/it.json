@@ -79,5 +79,6 @@
   "numpad-read-tile-tree-type-2": "Acero",
   "numpad-read-tile-tree-type-3": "Pino",
   "numpad-read-tile-tree-type-6": "Mogano",
-  "numpad-read-tile-fruit-tree-with-name": "Albero di {{name}} (stadio {{stage}})"
+  "numpad-read-tile-fruit-tree-with-name": "Albero di {{name}} (stadio {{stage}})",
+  "numpad-health-stamina": "Salute: {{health}}%, Energia: {{stamina}}%"
 }
