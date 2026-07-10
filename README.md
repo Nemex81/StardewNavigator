@@ -54,9 +54,15 @@ When **NumLock is ON**, the numeric keypad acts as a layered interface for movem
 - **`9`**: Select next hotbar slot (circular wrapping over 12 slots).
 - **`0`**: Read current coordinates and location display name (like `K`).
 
+### Navigator Menu (when open via `G` or `/`)
+When the Navigator Menu is active, the numpad provides direct navigation without switching to the main keyboard:
+- **`8`**: Move cursor up in the list (previous destination or POI).
+- **`2`**: Move cursor down in the list (next destination or POI).
+- **`LeftCtrl + 5`**: Confirm the current selection and start the automated route.
+
 ### 2. LeftCtrl Level (Character Physics & Actions)
 - **`LeftCtrl + 8, 2, 4, 6`**: Micro-movement precise (player walks fluidly pixel-per-pixel).
-- **`LeftCtrl + 5`**: Trigger Auto-Walk to the Object Tracker selected object (equivalent to `LeftCtrl + Home`).
+- **`LeftCtrl + 5`**: Trigger Auto-Walk to the Object Tracker selected object (equivalent to `LeftCtrl + Home`). **When the Navigator Menu is open, confirms the current selection instead.**
 - **`LeftCtrl + 9`**: Cancel active navigation.
 - **`LeftCtrl + 0`**: Alias of `LeftCtrl + Enter` (simulates Left Click in menus / Carpenter construction, and triggers Auto-Walk in the world).
 

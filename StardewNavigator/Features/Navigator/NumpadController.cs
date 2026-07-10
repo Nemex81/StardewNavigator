@@ -224,6 +224,29 @@ namespace StardewNavigator.Features.Navigator
             bool isPlayerFree = Context.IsPlayerFree;
             bool isInMenuBuilder = IsInMenuBuilderViewport();
 
+            // ─── Gestione tasti numerici quando il NavigatorMenu di StardewNavigator è aperto ──
+            // Questo blocco è eseguito PRIMA della guardia !isPlayerFree, poiché il menu
+            // blocca Context.IsPlayerFree. Intercetta solo i tasti pertinenti al menu.
+            if (Game1.activeClickableMenu is NavigatorMenu navMenu)
+            {
+                if (e.Button == SButton.NumPad8)
+                {
+                    navMenu.NumpadMoveCursor(-1); // Su nella lista
+                    return true;
+                }
+                if (e.Button == SButton.NumPad2)
+                {
+                    navMenu.NumpadMoveCursor(1);  // Giù nella lista
+                    return true;
+                }
+                if (ctrlPressed && e.Button == SButton.NumPad5)
+                {
+                    navMenu.NumpadConfirm(); // Conferma selezione e avvia percorso
+                    return true;
+                }
+                return false; // altri tasti numpad non intercettati nel NavigatorMenu
+            }
+
             // Blocca l'intercettazione se il giocatore non è libero (nei menu/chat/cutscene),
             // a meno che non si stia usando Ctrl o Shift (esplorazione) all'interno di un menu di costruzione (es. CarpenterMenu).
             if (!isPlayerFree && !(isInMenuBuilder && (ctrlPressed || shiftPressed)))

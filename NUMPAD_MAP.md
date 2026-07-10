@@ -35,6 +35,18 @@ Tasti operativi e navigazione categorie scanner.
 
 ---
 
+## 2b. Tasti numerici attivi nel Menu Navigatore
+
+Quando il Menu Navigatore è aperto (con `G` o `/`), i seguenti tasti del tastierino numerici sono attivi per navigare e confermare senza usare la tastiera principale.
+
+| Tasto Numpad | Azione | Note |
+| :--- | :--- | :--- |
+| **8** | Voce precedente | Sposta il cursore verso l'alto nella lista destinazioni o POI. |
+| **2** | Voce successiva | Sposta il cursore verso il basso nella lista destinazioni o POI. |
+| **Ctrl + 5** | Conferma selezione | Conferma la destinazione/POI selezionato e avvia il percorso automatico. |
+
+---
+
 ## 3. Livello LeftCtrl (Micro-movimento e Azioni di Sistema)
 
 Livello dedicato al controllo fisico fluido e alla gestione del navigatore.

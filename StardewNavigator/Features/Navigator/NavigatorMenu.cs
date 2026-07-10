@@ -267,6 +267,17 @@ namespace StardewNavigator.Features.Navigator
             }
         }
 
+        /// <summary>
+        /// Consente al NumpadController di spostare il cursore del menu verso l'alto o verso il basso.
+        /// </summary>
+        public void NumpadMoveCursor(int direction) => MoveCursor(direction);
+
+        /// <summary>
+        /// Consente al NumpadController di confermare la selezione corrente del menu
+        /// (equivalente alla pressione di Enter nel menu).
+        /// </summary>
+        public void NumpadConfirm() => ConfirmSelection();
+
         // Ridimensiona il menu in base al numero di voci del livello corrente
         private void ResizeForLevel2(int poiCount)
         {

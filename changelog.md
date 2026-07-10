@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.5] - 2026-07-10
+
+### Added
+- **Numpad navigation inside Navigator Menu**: when the menu is open (via `G` or `/`), `NumPad8` moves the cursor to the previous entry and `NumPad2` moves it to the next entry. This allows full keyboard-numpad-only menu navigation without switching hands to the main keyboard.
+- **`LeftCtrl + NumPad5` in Navigator Menu**: when the Navigator Menu is open, this combo confirms the selected destination/POI and starts the automated route — dual-use binding, context-aware (Object Tracker auto-walk when in world, menu confirm when menu is open).
+
+---
+
 ## [1.2.4] - 2026-07-10
 
 ### Added
