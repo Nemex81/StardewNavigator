@@ -15,6 +15,54 @@ namespace StardewNavigator.Features.Navigator
         private static int _activeDirection = -1;
         private static long _lastStepTick = 0;
         private static long _keyPressStartTick = 0;
+        private static bool _useFallbackMovement = false;
+
+        private static object? GetGridMovementInstance()
+        {
+            try
+            {
+                var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "stardew-access");
+                if (assembly == null) return null;
+
+                var type = assembly.GetType("stardew_access.Features.GridMovement");
+                if (type == null) return null;
+
+                var prop = type.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                return prop?.GetValue(null);
+            }
+            catch { return null; }
+        }
+
+        private static bool TryDelegateGridMovement(int direction, SButton sButton)
+        {
+            if (_useFallbackMovement) return false;
+
+            var instance = GetGridMovementInstance();
+            if (instance == null) return false;
+
+            try
+            {
+                var method = instance.GetType().GetMethod("HandleGridMovement", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                if (method == null)
+                {
+                    Log.Warn("[StardewNavigator] Metodo HandleGridMovement non trovato su stardew-access GridMovement. Attivo fallback locale.");
+                    _useFallbackMovement = true;
+                    return false;
+                }
+
+                var key = (Microsoft.Xna.Framework.Input.Keys)sButton;
+                var inputButton = new StardewValley.InputButton(key);
+
+                method.Invoke(instance, new object[] { direction, inputButton });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Warn($"[StardewNavigator] Errore nell'invocazione di HandleGridMovement: {ex.Message}. Attivo fallback locale.");
+                _useFallbackMovement = true;
+                return false;
+            }
+        }
 
         public static void OnUpdateTicked(UpdateTickedEventArgs e)
         {
@@ -224,6 +272,12 @@ namespace StardewNavigator.Features.Navigator
 
                     if (dir >= 0)
                     {
+                        if (TryDelegateGridMovement(dir, e.Button))
+                        {
+                            ResetMovement(); // resetta eventuale movimento continuo locale per evitare conflitti
+                            return true;
+                        }
+
                         StartContinuousMovement(e.Button, dir, Game1.ticks);
                         return true;
                     }
