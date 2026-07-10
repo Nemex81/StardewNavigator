@@ -2,7 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.7] - 2026-07-10
+
+### Fixed
+- **NumPad3 (interact/action) — chests and interactive objects**: replaced `pressActionButton` with a direct call to `location.checkAction()` on the tile in front of the player, mirroring the approach used by `stardew-access` in `GridMovement.cs`. This correctly triggers interactions with chests, NPCs, signs, machines, and all other tile-based interactive objects. A fallback to `pressActionButton` (using the raw XNA `GetKeyboardState()`) handles edge cases such as festival events and special doors.
+- **NumPad1 (use tool) — rapid-fire on repeated presses**: with `stardew-access` installed, now simulates `SButton.X` via `ModEntry.Helper.Input.Press`, delegating rate limiting to the native XNA input loop (one event per frame). Without `stardew-access`, a cooldown guard of 20 ticks (~333 ms at 60 FPS) prevents multiple tool activations from rapid key presses.
+
+---
+
 ## [1.2.6] - 2026-07-10
+
 
 ### Added
 - **`LeftCtrl + NumPad5` in any open menu (e.g. inventory/GameMenu)**: now acts as an alias of `LeftCtrl + Enter`, confirming selections inside menus without requiring the main keyboard. This extends the context-aware behaviour of `LeftCtrl + NumPad5` to all generic `IClickableMenu` instances (not just the Navigator Menu).

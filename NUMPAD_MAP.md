@@ -13,8 +13,8 @@ Comandi di locomozione, interazione primaria e lettura ambientale di base.
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
 | **8, 2, 4, 6** | Movimento a griglia (Nord, Sud, Ovest, Est) | Delega a `stardew-access` se presente, altrimenti fallback locale. |
-| **1** | Usa Attrezzo | Emula la pressione del tasto `X`. |
-| **3** | Azione / Interazione | Emula la pressione del tasto `C`. |
+| **1** | Usa Attrezzo | Con `stardew-access`: simula `SButton.X` (rate limiting nativo). Senza: `pressUseToolButton()` con cooldown di 20 ticks (~333ms). |
+| **3** | Azione / Interazione | Chiama `location.checkAction()` direttamente sulla tile di fronte (apre bauli, parla con NPC, interagisce con macchine). Fallback a `pressActionButton` (stato XNA grezzo) per porte ed eventi speciali. |
 | **5** | Leggi Tile di fronte | Lettura del blocco davanti al giocatore. |
 | **7** | Slot precedente hotbar | Seleziona lo slot attivo precedente della toolbar (wrapping circolare su 12 slot). |
 | **0** | Leggi Coordinate | Emula il tasto `K` di stardew-access. |

@@ -47,8 +47,8 @@ When **NumLock is ON**, the numeric keypad acts as a layered interface for movem
 
 ### 1. Base Level (No Modifiers)
 - **`8, 2, 4, 6`**: Move grid up, down, left, right (delegates to `stardew-access` if available, otherwise fallback locale).
-- **`1`**: Use Tool (`X` key mirror).
-- **`3`**: Action / Interact / Check (`C` key mirror).
+- **`1`**: Use Tool — with `stardew-access`: simulates native `X` key (rate-limited by XNA). Without it: `pressUseToolButton()` with 20-tick cooldown (~333 ms).
+- **`3`**: Action/Interact — calls `location.checkAction()` directly on the facing tile (opens chests, talks to NPCs, uses machines). Falls back to `pressActionButton` for special doors and events.
 - **`5`**: Read tile in front of the player (facing tile).
 - **`7`**: Select previous hotbar slot (circular wrapping over 12 slots).
 - **`9`**: Select next hotbar slot (circular wrapping over 12 slots).

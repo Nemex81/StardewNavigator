@@ -17,6 +17,12 @@ namespace StardewNavigator.Features.Navigator
         private static long _keyPressStartTick = 0;
         private static bool _useFallbackMovement = false;
 
+        // Cooldown per l'uso dell'attrezzo (NumPad1): evita attivazioni multiple ravvicinate.
+        // ~20 ticks = ~333ms a 60 FPS, pari alla durata di una singola oscillazione attrezzo.
+        private static int _lastUseToolTick = 0;
+        private const int UseToolCooldownTicks = 20;
+
+
         private static SButton _activeCursorKey = SButton.None;
         private static Vector2 _activeCursorDelta = Vector2.Zero;
         private static long _lastCursorStepTick = 0;
@@ -425,14 +431,51 @@ namespace StardewNavigator.Features.Navigator
 
                 if (e.Button == SButton.NumPad1)
                 {
-                    // Numpad1 = usa attrezzo (X)
-                    Game1.pressUseToolButton();
+                    // NumPad1 = usa attrezzo (≡ X in stardew-access)
+                    // Con stardew-access: simula SButton.X tramite il sistema di input nativo,
+                    // che ha già il rate limiting integrato nel loop XNA (un evento per frame fisico).
+                    // Senza stardew-access: cooldown manuale a ticks per prevenire attivazioni a raffica.
+                    int currentTick = Game1.ticks;
+                    if (GetObjectTrackerInstance() != null)
+                    {
+                        // stardew-access presente: delega al sistema nativo tramite simulazione SButton.X
+                        ModEntry.Helper.Input.Press(SButton.X);
+                    }
+                    else if (currentTick - _lastUseToolTick >= UseToolCooldownTicks)
+                    {
+                        // Fallback standalone con cooldown
+                        _lastUseToolTick = currentTick;
+                        Game1.pressUseToolButton();
+                    }
                     return true;
                 }
                 if (e.Button == SButton.NumPad3)
                 {
-                    // Numpad3 = azione / interazione (C)
-                    Game1.pressActionButton(Game1.input.GetKeyboardState(), Game1.input.GetMouseState(), Game1.input.GetGamePadState());
+                    // NumPad3 = azione / interazione (≡ C in stardew-access)
+                    // Strategia: invoca location.checkAction() direttamente sulla tile di fronte
+                    // al giocatore, esattamente come fa stardew-access in GridMovement.cs.
+                    // Questo garantisce il funzionamento con bauli, NPC, oggetti interattivi.
+                    // Fallback: pressActionButton con GetKeyboardState() (stato XNA grezzo)
+                    // per porte speciali, eventi ed edge cases.
+                    var _player = Game1.player;
+                    var _location = Game1.currentLocation;
+                    bool actionHandled = false;
+                    if (_player != null && _location != null)
+                    {
+                        int fd = _player.FacingDirection;
+                        int ax = (int)_player.Tile.X + (fd == 1 ? 1 : fd == 3 ? -1 : 0);
+                        int ay = (int)_player.Tile.Y + (fd == 2 ? 1 : fd == 0 ? -1 : 0);
+                        var actionLoc = new xTile.Dimensions.Location(ax * 64, ay * 64);
+                        actionHandled = _location.checkAction(actionLoc, Game1.viewport, _player);
+                    }
+                    if (!actionHandled)
+                    {
+                        // Fallback: pressActionButton con stato tastiera XNA grezzo
+                        Game1.pressActionButton(
+                            Game1.GetKeyboardState(),
+                            Game1.input.GetMouseState(),
+                            Game1.input.GetGamePadState());
+                    }
                     return true;
                 }
                 if (e.Button == SButton.NumPad5)
