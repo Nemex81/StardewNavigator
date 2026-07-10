@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2026-07-10
+
+### Added
+- **Auto-Walk Mapping Optimization**: Reassigned `LeftCtrl + NumPad5` to trigger `stardew-access` Auto-Walk (equivalent to `LeftCtrl + Home` or `LeftCtrl + NumPad0`).
+- **Redundancy Clean-Up**: Removed the redundant standing tile reading from `LeftCtrl + NumPad5`, leaving `LeftAlt + NumPad5` as the sole standing tile reader on the number 5 key (matching `LeftAlt + J` in stardew-access).
+
 ## [1.2.1] - 2026-07-10
 
 ### Added

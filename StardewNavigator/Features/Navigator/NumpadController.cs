@@ -323,7 +323,7 @@ namespace StardewNavigator.Features.Navigator
                 }
                 if (e.Button == SButton.NumPad5)
                 {
-                    ReadTile(true); // Ctrl + 5 = Leggi tile sotto i piedi
+                    TriggerAutoWalk(); // Ctrl + 5 = Auto-Walk al cursore TileViewer (≡ LeftCtrl + Home)
                     return true;
                 }
                 if (e.Button == SButton.NumPad9)

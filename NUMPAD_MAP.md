@@ -42,7 +42,7 @@ Livello dedicato al controllo fisico fluido e alla gestione del navigatore.
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
 | **Ctrl + 8, 2, 4, 6** | Micro-movimento (fluido) | Bypass del GridMovement, permette al gioco di gestire l'input nativamente pixel-per-pixel. |
-| **Ctrl + 5** | Leggi Tile sotto i piedi | Lettura del blocco su cui si trova il giocatore (alias di Alt+5). |
+| **Ctrl + 5** | Auto-Walk al target | Avvia il movimento automatico verso il target corrente (emula `LeftCtrl + Home`, alias di Ctrl+0). |
 | **Ctrl + 9** | Annulla Navigazione | Interrompe il routing BFS attivo. |
 | **Ctrl + 0** | Auto-Walk al target | Avvia il movimento automatico verso il target corrente (emula `LeftCtrl + Home`). |
 | **Ctrl + `+`** | Ciclo Scanner: Categoria (Su) | Speculare a `LeftCtrl + PageUp`. |
