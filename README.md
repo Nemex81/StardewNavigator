@@ -49,25 +49,26 @@ When **NumLock is ON**, the numeric keypad acts as a layered interface for movem
 - **`5`**: Read tile in front of the player (facing tile).
 - **`7`**: Read current coordinates and location display name.
 - **`9`**: Open Navigator Menu.
+- **`0`**: Read current coordinates and location display name (like `K`).
 
 ### 2. LeftCtrl Level (Character Physics & Actions)
 - **`LeftCtrl + 8, 2, 4, 6`**: Micro-movement precise (player walks fluidly pixel-per-pixel).
 - **`LeftCtrl + 5`**: Read tile player is standing on.
 - **`LeftCtrl + 9`**: Cancel active navigation.
+- **`LeftCtrl + 0`**: Trigger Auto-Walk to the TileViewer cursor.
 
 ### 3. LeftShift Level (Tile Cursor & Navigation)
 - **`LeftShift + 8, 2, 4, 6`**: Move `stardew-access` TileViewer cursor.
 - **`LeftShift + 5`**: Read current coordinates and location display name.
 - **`LeftShift + 9`**: Read active navigation route status.
-- **`LeftShift + 0`**: Trigger Auto-Walk to the TileViewer cursor.
 
 ### 4. LeftAlt Level (Player Vitals)
 - **`LeftAlt + 5`**: Read player health and stamina.
+- **`LeftAlt + 0`**: Read player health and stamina.
 
-### 5. Scanner Controls ( Matematics keys, unmodified by Shift/Ctrl)
-- **`/` (Divide)**: Read currently selected scanner object.
-- **`Ctrl + /`**: Move to currently selected scanner object (Auto-Walk).
-- **`*` (Multiply)**: Read selected scanner object tile location.
+### 5. Utility & Scanner Controls
+- **`*` (Multiply)**: Open Inventory.
+- **`/` (Divide)**: Open Navigator Menu.
 - **`+` (Add)**: Cycle upwards (Group without modifier, Category with `Ctrl`, Item in group with `Shift`).
 - **`-` (Subtract)**: Cycle downwards (Group without modifier, Category with `Ctrl`, Item in group with `Shift`).
 

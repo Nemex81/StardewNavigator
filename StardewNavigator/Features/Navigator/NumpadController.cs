@@ -232,22 +232,15 @@ namespace StardewNavigator.Features.Navigator
                 return false;
             }
 
-            // 1. Comandi dello Scanner (Object Tracker) tramite tasti matematici
-            if (e.Button == SButton.Divide)
+            // 1. Comandi del tastierino per Menu e Inventario (senza modificatori)
+            if (e.Button == SButton.Divide && !ctrlPressed && !shiftPressed && !altPressed)
             {
-                if (ctrlPressed)
-                {
-                    TriggerObjectTrackerAction("MoveToCurrentlySelectedObject");
-                }
-                else
-                {
-                    TriggerObjectTrackerAction("ReadCurrentlySelectedObject", new object[] { false });
-                }
+                OpenMenu(registry, navigator, routeEngine); // NumPadDivide = open destinations menu (like G)
                 return true;
             }
-            if (e.Button == SButton.Multiply)
+            if (e.Button == SButton.Multiply && !ctrlPressed && !shiftPressed && !altPressed)
             {
-                TriggerObjectTrackerAction("ReadCurrentlySelectedObject", new object[] { true });
+                Game1.activeClickableMenu = new StardewValley.Menus.GameMenu(); // NumPadMultiply = open inventory
                 return true;
             }
             if (e.Button == SButton.Add)
@@ -316,11 +309,6 @@ namespace StardewNavigator.Features.Navigator
                     ReadNavStatus(navigator); // Shift + 9 = Stato navigazione
                     return true;
                 }
-                if (e.Button == SButton.NumPad0)
-                {
-                    TriggerAutoWalk(); // Shift + 0 = Auto-Walk al cursore TileViewer
-                    return true;
-                }
             }
 
             // 3. Livello LeftCtrl (Micro-movimento preciso ed esplorazione fisica)
@@ -344,6 +332,11 @@ namespace StardewNavigator.Features.Navigator
                     CancelNav(navigator); // Ctrl + 9 = Annulla navigazione
                     return true;
                 }
+                if (e.Button == SButton.NumPad0)
+                {
+                    TriggerAutoWalk(); // Ctrl + 0 = Auto-Walk al cursore TileViewer
+                    return true;
+                }
             }
 
             // 4. Livello LeftAlt (Stato vitale del personaggio)
@@ -352,6 +345,11 @@ namespace StardewNavigator.Features.Navigator
                 if (e.Button == SButton.NumPad5)
                 {
                     ReadHealthAndStamina(); // Alt + 5 = Leggi salute / energia
+                    return true;
+                }
+                if (e.Button == SButton.NumPad0)
+                {
+                    ReadHealthAndStamina(); // Alt + 0 = Leggi salute / energia
                     return true;
                 }
             }
@@ -408,6 +406,11 @@ namespace StardewNavigator.Features.Navigator
                 if (e.Button == SButton.NumPad7)
                 {
                     ReadCoords(); // Numpad7 = leggi coordinate (K) come fallback o tasto base alternativo
+                    return true;
+                }
+                if (e.Button == SButton.NumPad0)
+                {
+                    ReadCoords(); // NumPad0 = leggi coordinate (K)
                     return true;
                 }
                 if (e.Button == SButton.NumPad9)
