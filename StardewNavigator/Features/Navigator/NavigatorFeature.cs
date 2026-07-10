@@ -76,6 +76,7 @@ namespace StardewNavigator.Features.Navigator
         {
             if (!Context.IsWorldReady) return;
             _navigator.OnUpdateTicked(e);
+            NumpadController.OnUpdateTicked(e);
         }
 
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)

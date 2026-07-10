@@ -11,6 +11,83 @@ namespace StardewNavigator.Features.Navigator
 {
     public static class NumpadController
     {
+        private static SButton _activeDirectionKey = SButton.None;
+        private static int _activeDirection = -1;
+        private static long _lastStepTick = 0;
+        private static long _keyPressStartTick = 0;
+
+        public static void OnUpdateTicked(UpdateTickedEventArgs e)
+        {
+            if (!ModEntry.Config.NumpadControlsActive) return;
+            if (!IsNumLockActive()) return;
+            if (!Context.IsWorldReady) return;
+
+            if (_activeDirectionKey == SButton.None) return;
+
+            // Se il tasto non è più premuto, resettiamo
+            if (!ModEntry.Helper.Input.IsDown(_activeDirectionKey))
+            {
+                ResetMovement();
+                return;
+            }
+
+            // Se il giocatore non è più libero, resettiamo
+            if (!Context.IsPlayerFree)
+            {
+                ResetMovement();
+                return;
+            }
+
+            // Se viene premuto Ctrl (modalità TileViewer cursor), interrompiamo il movimento continuo della griglia
+            bool ctrlPressed = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
+            if (ctrlPressed)
+            {
+                ResetMovement();
+                return;
+            }
+
+            long currentTick = Game1.ticks;
+            long elapsedTicks = currentTick - _keyPressStartTick;
+
+            // Ritardo iniziale per la ripetizione (circa 400ms = 24 tick a 60fps)
+            const int initialDelayTicks = 24;
+            if (elapsedTicks < initialDelayTicks)
+            {
+                return;
+            }
+
+            // Calcolo dell'intervallo di ripetizione dinamico basato sulla velocità del giocatore.
+            // A velocità standard (4.6), desideriamo circa 200ms = 12 tick.
+            float speed = Game1.player.getMovementSpeed();
+            if (speed <= 0) speed = 4.6f;
+            int repeatIntervalTicks = (int)Math.Max(5, Math.Round(55f / speed));
+
+            if (currentTick - _lastStepTick >= repeatIntervalTicks)
+            {
+                MoveGrid(_activeDirection);
+                _lastStepTick = currentTick;
+            }
+        }
+
+        private static void StartContinuousMovement(SButton button, int direction, long currentTick)
+        {
+            _activeDirectionKey = button;
+            _activeDirection = direction;
+            _keyPressStartTick = currentTick;
+            _lastStepTick = currentTick;
+
+            // Eseguiamo il primo passo immediatamente
+            MoveGrid(direction);
+        }
+
+        private static void ResetMovement()
+        {
+            _activeDirectionKey = SButton.None;
+            _activeDirection = -1;
+            _lastStepTick = 0;
+            _keyPressStartTick = 0;
+        }
+
         public static bool HandleButton(
             ButtonPressedEventArgs e, 
             Navigator navigator, 
@@ -127,26 +204,32 @@ namespace StardewNavigator.Features.Navigator
             }
 
             // 2. Comandi standard del Numpad (senza Ctrl)
-            if (e.Button == SButton.NumPad8)
+            if (!ctrlPressed)
             {
-                MoveGrid(0); // Up
-                return true;
+                if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad6 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4)
+                {
+                    if (navigator.IsActive)
+                    {
+                        navigator.CancelNavigation("input movimento manuale");
+                    }
+
+                    int dir = e.Button switch
+                    {
+                        SButton.NumPad8 => 0,
+                        SButton.NumPad6 => 1,
+                        SButton.NumPad2 => 2,
+                        SButton.NumPad4 => 3,
+                        _ => -1
+                    };
+
+                    if (dir >= 0)
+                    {
+                        StartContinuousMovement(e.Button, dir, Game1.ticks);
+                        return true;
+                    }
+                }
             }
-            if (e.Button == SButton.NumPad6)
-            {
-                MoveGrid(1); // Right
-                return true;
-            }
-            if (e.Button == SButton.NumPad2)
-            {
-                MoveGrid(2); // Down
-                return true;
-            }
-            if (e.Button == SButton.NumPad4)
-            {
-                MoveGrid(3); // Left
-                return true;
-            }
+
             if (e.Button == SButton.NumPad5)
             {
                 bool altPressed = ModEntry.Helper.Input.IsDown(SButton.LeftAlt) || ModEntry.Helper.Input.IsDown(SButton.RightAlt);
