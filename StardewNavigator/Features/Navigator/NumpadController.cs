@@ -333,7 +333,7 @@ namespace StardewNavigator.Features.Navigator
                 }
                 if (e.Button == SButton.NumPad0)
                 {
-                    TriggerAutoWalk(); // Ctrl + 0 = Auto-Walk al cursore TileViewer
+                    ModEntry.Helper.Input.Press(SButton.Enter); // Ctrl + 0 = Alias di LeftCtrl + Enter (Auto-Walk / Left Click)
                     return true;
                 }
             }

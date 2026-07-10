@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.3] - 2026-07-10
+
+### Added
+- **LeftCtrl + NumPad0 Alias of LeftCtrl + Enter**: Reassigned `LeftCtrl + NumPad0` to virtually press `SButton.Enter` when triggered. When combined with the active `LeftCtrl` modifier, this acts as a direct alias of `LeftCtrl + Enter` in all contexts:
+  - Triggers Auto-Walk to the TileViewer cursor in the world.
+  - Simulates a Left Click in menus (such as chest items, menu buttons, and Carpenter building construction confirmation).
+
 ## [1.2.2] - 2026-07-10
 
 ### Added
