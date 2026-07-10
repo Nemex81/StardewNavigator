@@ -93,6 +93,13 @@ per SMAPI e ModBuildConfig, e alla community di modding di Stardew Valley.
 
 ## Changelog
 
+### v1.2.0
+- **Active Hotbar Item Reader**: Added `LeftAlt + NumPad7` and `LeftAlt + NumPad9` (alias) to announce the currently held item (TTS/HUD fallback, empty slot detection).
+- **Hotbar Slot Cycling**: Reassigned `NumPad7` and `NumPad9` base level to select the previous/next hotbar slot with circular wrapping.
+- **Utility Key Reassignments**: Mapped `NumPad0` to coordinates, `LeftCtrl+NumPad0` to Auto-Walk, `LeftAlt+NumPad0` to Vitals, `*` to Inventory, and `/` to Destinations Menu.
+- **Scanner Key Alignments**: Matched cycle controls of `+` and `-` to `PageUp` and `PageDown` modifiers of `stardew-access`.
+- **Bypassed Double Movement**: Appended Numpad keys to game settings on load for smooth native micro-movement under `LeftCtrl`.
+
 ### v1.1.0
 - **Numpad Controls**: Added comprehensive keypad-driven layout for manual movement, inspection, coordinates, menu, and scanner controls (active when `NumLock` is ON).
 - **stardew-access Bridge**: Added reflection bridge to support `stardew-access` TileViewer exploration cursor and Auto-Walk scanner functionality.
