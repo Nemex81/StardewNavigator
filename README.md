@@ -60,9 +60,11 @@ When the Navigator Menu is active, the numpad provides direct navigation without
 - **`2`**: Move cursor down in the list (next destination or POI).
 - **`LeftCtrl + 5`**: Confirm the current selection and start the automated route.
 
+> **`LeftCtrl + NumPad5` is context-aware**: it confirms the Navigator Menu selection when that menu is open, acts as `LeftCtrl + Enter` in any other menu (inventory, shops, dialogues…), and triggers Object Tracker Auto-Walk when no menu is open.
+
 ### 2. LeftCtrl Level (Character Physics & Actions)
 - **`LeftCtrl + 8, 2, 4, 6`**: Micro-movement precise (player walks fluidly pixel-per-pixel).
-- **`LeftCtrl + 5`**: Trigger Auto-Walk to the Object Tracker selected object (equivalent to `LeftCtrl + Home`). **When the Navigator Menu is open, confirms the current selection instead.**
+- **`LeftCtrl + 5`**: Context-aware — confirms Navigator Menu selection when that menu is open; acts as `LeftCtrl + Enter` in any other menu (inventory, shops…); triggers Object Tracker Auto-Walk in the world (equivalent to `LeftCtrl + Home`).
 - **`LeftCtrl + 9`**: Cancel active navigation.
 - **`LeftCtrl + 0`**: Alias of `LeftCtrl + Enter` (simulates Left Click in menus / Carpenter construction, and triggers Auto-Walk in the world).
 

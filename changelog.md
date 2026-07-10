@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.6] - 2026-07-10
+
+### Added
+- **`LeftCtrl + NumPad5` in any open menu (e.g. inventory/GameMenu)**: now acts as an alias of `LeftCtrl + Enter`, confirming selections inside menus without requiring the main keyboard. This extends the context-aware behaviour of `LeftCtrl + NumPad5` to all generic `IClickableMenu` instances (not just the Navigator Menu).
+
+---
+
 ## [1.2.5] - 2026-07-10
+
 
 ### Added
 - **Numpad navigation inside Navigator Menu**: when the menu is open (via `G` or `/`), `NumPad8` moves the cursor to the previous entry and `NumPad2` moves it to the next entry. This allows full keyboard-numpad-only menu navigation without switching hands to the main keyboard.

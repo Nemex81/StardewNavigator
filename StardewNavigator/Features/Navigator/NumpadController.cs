@@ -247,6 +247,16 @@ namespace StardewNavigator.Features.Navigator
                 return false; // altri tasti numpad non intercettati nel NavigatorMenu
             }
 
+            // ─── LeftCtrl+NumPad5 come alias di LeftCtrl+Enter in qualsiasi altro menu aperto ──
+            // Gestisce l'inventario (GameMenu) e altri menu generici: quando il giocatore non è
+            // libero ma è in un menu, simula Enter così da confermare selezioni / interazioni,
+            // replicando il comportamento di LeftCtrl+NumPad0 ma con il tasto 5 centrale.
+            if (!isPlayerFree && Game1.activeClickableMenu != null && ctrlPressed && e.Button == SButton.NumPad5)
+            {
+                ModEntry.Helper.Input.Press(SButton.Enter); // Ctrl+5 ≡ Ctrl+Enter nel menu
+                return true;
+            }
+
             // Blocca l'intercettazione se il giocatore non è libero (nei menu/chat/cutscene),
             // a meno che non si stia usando Ctrl o Shift (esplorazione) all'interno di un menu di costruzione (es. CarpenterMenu).
             if (!isPlayerFree && !(isInMenuBuilder && (ctrlPressed || shiftPressed)))

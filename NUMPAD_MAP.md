@@ -47,6 +47,18 @@ Quando il Menu Navigatore è aperto (con `G` o `/`), i seguenti tasti del tastie
 
 ---
 
+## 2c. `LeftCtrl + 5` in qualsiasi menu aperto (inventario, negozi, dialoghi, ecc.)
+
+`LeftCtrl + NumPad5` è un binding **context-aware**: il suo comportamento cambia in base al contesto attivo.
+
+| Contesto | Comportamento |
+| :--- | :--- |
+| **Menu Navigatore aperto** | Conferma la destinazione/POI corrente e avvia il percorso automatico |
+| **Qualsiasi altro menu aperto** (GameMenu, negozi, dialoghi…) | Alias di `LeftCtrl + Enter` → conferma la selezione attiva nel menu |
+| **Nessun menu (nel mondo)** | Avvia Auto-Walk verso l'oggetto selezionato nell'Object Tracker (`≡ LeftCtrl + Home`) |
+
+---
+
 ## 3. Livello LeftCtrl (Micro-movimento e Azioni di Sistema)
 
 Livello dedicato al controllo fisico fluido e alla gestione del navigatore.
@@ -54,7 +66,7 @@ Livello dedicato al controllo fisico fluido e alla gestione del navigatore.
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
 | **Ctrl + 8, 2, 4, 6** | Micro-movimento (fluido) | Bypass del GridMovement, permette al gioco di gestire l'input nativamente pixel-per-pixel. |
-| **Ctrl + 5** | Auto-Walk all'oggetto | Avvia il movimento automatico verso l'oggetto selezionato nell'Object Tracker (emula `LeftCtrl + Home`). |
+| **Ctrl + 5** | Auto-Walk / Conferma menu | Nel mondo: avvia Auto-Walk verso l'oggetto Object Tracker (`≡ LeftCtrl + Home`). In qualsiasi menu aperto: alias di `LeftCtrl + Enter`. |
 | **Ctrl + 9** | Annulla Navigazione | Interrompe il routing BFS attivo. |
 | **Ctrl + 0** | Alias LeftCtrl + Enter | Emula la pressione di `LeftCtrl + Enter` per eseguire Left Click nei menu e Auto-Walk nel mondo. |
 | **Ctrl + `+`** | Ciclo Scanner: Categoria (Su) | Speculare a `LeftCtrl + PageUp`. |
