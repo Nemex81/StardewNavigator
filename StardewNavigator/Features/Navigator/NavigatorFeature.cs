@@ -34,6 +34,7 @@ namespace StardewNavigator.Features.Navigator
             helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.Player.Warped += OnPlayerWarped;
+            helper.Events.Content.LocaleChanged += OnLocaleChanged;
 
 #if DEBUG
             // Registra il comando di console SMAPI per il test di fallback deterministico
@@ -111,6 +112,12 @@ namespace StardewNavigator.Features.Navigator
         {
             if (!Context.IsWorldReady) return;
             _navigator.OnPlayerWarped(e);
+        }
+
+        private void OnLocaleChanged(object? sender, LocaleChangedEventArgs e)
+        {
+            if (!Context.IsWorldReady) return;
+            _destinationRegistry.ResolveCoordinates(_routeEngine);
         }
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
