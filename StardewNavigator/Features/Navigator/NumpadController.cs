@@ -210,10 +210,9 @@ namespace StardewNavigator.Features.Navigator
 
             if (!Context.IsWorldReady) return false;
 
-            // Se viene premuto un tasto scanner matematico, verifica la presenza dell'Object Tracker di stardew-access.
-            // Se non è installata, lasciamo passare il tasto al gioco.
-            bool isScannerKey = e.Button == SButton.Divide || e.Button == SButton.Multiply || 
-                                e.Button == SButton.Add || e.Button == SButton.Subtract;
+            // Se viene premuto un tasto scanner (Add/Subtract), verifica la presenza dell'Object Tracker di stardew-access.
+            // Divide e Multiply sono funzioni standalone (menu/inventario) e non richiedono stardew-access.
+            bool isScannerKey = e.Button == SButton.Add || e.Button == SButton.Subtract;
             if (isScannerKey && GetObjectTrackerInstance() == null)
             {
                 return false;
@@ -405,7 +404,8 @@ namespace StardewNavigator.Features.Navigator
                 }
                 if (e.Button == SButton.NumPad7)
                 {
-                    ReadCoords(); // Numpad7 = leggi coordinate (K) come fallback o tasto base alternativo
+                    // NumPad7 = slot precedente della hotbar attiva (wrapping circolare su 12 slot)
+                    Game1.player.CurrentToolIndex = (Game1.player.CurrentToolIndex + 11) % 12;
                     return true;
                 }
                 if (e.Button == SButton.NumPad0)
@@ -415,7 +415,8 @@ namespace StardewNavigator.Features.Navigator
                 }
                 if (e.Button == SButton.NumPad9)
                 {
-                    OpenMenu(registry, navigator, routeEngine); // Numpad9 = menu navigatore
+                    // NumPad9 = slot successivo della hotbar attiva (wrapping circolare su 12 slot)
+                    Game1.player.CurrentToolIndex = (Game1.player.CurrentToolIndex + 1) % 12;
                     return true;
                 }
             }

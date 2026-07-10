@@ -16,9 +16,9 @@ Comandi di locomozione, interazione primaria e lettura ambientale di base.
 | **1** | Usa Attrezzo | Emula la pressione del tasto `X`. |
 | **3** | Azione / Interazione | Emula la pressione del tasto `C`. |
 | **5** | Leggi Tile di fronte | Lettura del blocco davanti al giocatore. |
-| **7** | Leggi Coordinate | Simile al tasto `K` di stardew-access. |
-| **0** | Leggi Coordinate | Assegnazione ergonomica alternativa per il tasto `K`. |
-| **9** | Apri Menu Navigatore | Apre la GUI per scegliere destinazioni (come `G`). |
+| **7** | Slot precedente hotbar | Seleziona lo slot attivo precedente della toolbar (wrapping circolare su 12 slot). |
+| **0** | Leggi Coordinate | Emula il tasto `K` di stardew-access. |
+| **9** | Slot successivo hotbar | Seleziona lo slot attivo successivo della toolbar (wrapping circolare su 12 slot). |
 
 ---
 
@@ -78,7 +78,9 @@ Livello dedicato all'esplorazione virtuale tramite TileViewer, senza muovere il 
 Al fine di evitare collisioni e mantenere la configurazione snella, le seguenti combinazioni **non intercettano input** e lasciano passare il comando al motore di gioco (o ad altre mod):
 
 * **Shift + 0**: Rimosso intenzionalmente. La funzione Auto-Walk è stata spostata esclusivamente su `Ctrl + 0`.
-* **Modificatori (Ctrl/Alt/Shift) + `*` (Moltiplica)**: Nessuna assegnazione.
+* **Ctrl/Alt/Shift + 7**: Nessuna assegnazione. `Ctrl+7`, `Shift+7`, `Alt+7` non sono gestiti.
+* **Alt + 9**: Nessuna assegnazione. `Alt+9` non è gestito.
+* **Modificatori (Ctrl/Alt/Shift) + `*` (Moltiplica)**: Nessuna assegnazione. `Multiply` e `Divide` senza modificatori aprono rispettivamente Inventario e Menu Navigatore — funzioni standalone non dipendenti da stardew-access.
 * **Modificatori (Ctrl/Alt/Shift) + `/` (Dividi)**: Nessuna assegnazione.
 * **Altre combinazioni non elencate**: Se non specificato sopra, la combinazione non è gestita da NumpadController.
 

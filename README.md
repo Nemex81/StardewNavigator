@@ -50,8 +50,8 @@ When **NumLock is ON**, the numeric keypad acts as a layered interface for movem
 - **`1`**: Use Tool (`X` key mirror).
 - **`3`**: Action / Interact / Check (`C` key mirror).
 - **`5`**: Read tile in front of the player (facing tile).
-- **`7`**: Read current coordinates and location display name.
-- **`9`**: Open Navigator Menu.
+- **`7`**: Select previous hotbar slot (circular wrapping over 12 slots).
+- **`9`**: Select next hotbar slot (circular wrapping over 12 slots).
 - **`0`**: Read current coordinates and location display name (like `K`).
 
 ### 2. LeftCtrl Level (Character Physics & Actions)
