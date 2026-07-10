@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2026-07-10
+
+### Added
+- **ReadTile Reflection Bridge**: Implemented a reflection lookup to delegate `NumPad5` (facing tile) and `LeftAlt + NumPad5` (standing tile) directly to `stardew-access`'s native `ReadTile` feature when installed.
+  - Matches the exact formatting and translation output of `J` and `LeftAlt + J`.
+- **Improved Standalone Fallback**: Replaced mouse-sensitive tool location with bounding box directional math (mirroring `stardew-access` `FacingTile` property) for accurate standalone face-tile reading.
+- **Alias Support**: Maintained `LeftCtrl + NumPad5` as an intentional alias of the standing tile reader for backwards compatibility.
+
+### Fixed
+- **Italian Hardcoded Fallbacks**: Replaced hardcoded Italian tree names (`Quercia`, `Acero`, etc.) in C# code with standard English fallbacks (`Oak`, `Maple`, etc.), ensuring proper non-Italian game play formatting when translation files are absent.
+- **Vitals Redundancy**: Removed vitals narration from `LeftAlt + NumPad5` to align it to standing tile reading, leaving `LeftAlt + NumPad0` as the dedicated vital statistics command.
+
 ## [1.2.0] - 2026-07-10
 
 ### Added

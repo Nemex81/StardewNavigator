@@ -65,9 +65,9 @@ When **NumLock is ON**, the numeric keypad acts as a layered interface for movem
 - **`LeftShift + 5`**: Read current coordinates and location display name.
 - **`LeftShift + 9`**: Read active navigation route status.
 
-### 4. LeftAlt Level (Player Vitals & Held Item)
-- **`LeftAlt + 5`**: Read player health and stamina.
-- **`LeftAlt + 0`**: Read player health and stamina.
+### 4. LeftAlt Level (Player Vitals, Held Item & Standing Tile)
+- **`LeftAlt + 5`**: Read standing tile (equivalent to `LeftAlt + J` in stardew-access).
+- **`LeftAlt + 0`**: Read player health and stamina (vital stats).
 - **`LeftAlt + 7`**: Read selected hotbar item (alias).
 - **`LeftAlt + 9`**: Read selected hotbar item (alias).
 
@@ -92,6 +92,12 @@ Ringraziamenti speciali al team di stardew-access, a Pathoschild
 per SMAPI e ModBuildConfig, e alla community di modding di Stardew Valley.
 
 ## Changelog
+
+### v1.2.1
+- **ReadTile Reflection & Alignment**: Delegated `NumPad5` (facing tile) and `LeftAlt + NumPad5` (standing tile) to `stardew-access` native `ReadTile` feature via reflection when present.
+- **Improved Standalone Fallback**: Aligned standalone `NumPad5` facing tile detection to mirror `stardew-access` `FacingTile` bounding box calculations exactly.
+- **Removed Italian Fallbacks**: Fixed C# tree fallback labels to use English terminology (`Oak`, `Maple`, etc.) for non-Italian language play.
+- **Cleaned Vitals Bindings**: Reserved `LeftAlt + NumPad0` as the vital statistics command, freeing `LeftAlt + NumPad5` to read the standing tile (matching `LeftAlt + J`).
 
 ### v1.2.0
 - **Active Hotbar Item Reader**: Added `LeftAlt + NumPad7` and `LeftAlt + NumPad9` (alias) to announce the currently held item (TTS/HUD fallback, empty slot detection).

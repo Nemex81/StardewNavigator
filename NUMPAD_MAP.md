@@ -42,7 +42,7 @@ Livello dedicato al controllo fisico fluido e alla gestione del navigatore.
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
 | **Ctrl + 8, 2, 4, 6** | Micro-movimento (fluido) | Bypass del GridMovement, permette al gioco di gestire l'input nativamente pixel-per-pixel. |
-| **Ctrl + 5** | Leggi Tile sotto i piedi | Lettura del blocco su cui si trova il giocatore. |
+| **Ctrl + 5** | Leggi Tile sotto i piedi | Lettura del blocco su cui si trova il giocatore (alias di Alt+5). |
 | **Ctrl + 9** | Annulla Navigazione | Interrompe il routing BFS attivo. |
 | **Ctrl + 0** | Auto-Walk al target | Avvia il movimento automatico verso il target corrente (emula `LeftCtrl + Home`). |
 | **Ctrl + `+`** | Ciclo Scanner: Categoria (Su) | Speculare a `LeftCtrl + PageUp`. |
@@ -64,11 +64,11 @@ Livello dedicato all'esplorazione virtuale tramite TileViewer, senza muovere il 
 
 ---
 
-## 5. Livello LeftAlt (Stato Vitale & Oggetto Selezionato)
+## 5. Livello LeftAlt (Stato Vitale, Oggetto Selezionato & Tile sotto i piedi)
 
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
-| **Alt + 5** | Leggi Salute / Energia | Emula il comando `H` di stardew-access. |
+| **Alt + 5** | Leggi Tile sotto i piedi | Emula il comando `LeftAlt + J` di stardew-access. |
 | **Alt + 0** | Leggi Salute / Energia | Assegnazione ergonomica alternativa per le statistiche vitali. |
 | **Alt + 7** | Leggi Oggetto Impugnato | Annuncia l'oggetto attualmente selezionato nella hotbar (alias). |
 | **Alt + 9** | Leggi Oggetto Impugnato | Annuncia l'oggetto attualmente selezionato nella hotbar (alias). |

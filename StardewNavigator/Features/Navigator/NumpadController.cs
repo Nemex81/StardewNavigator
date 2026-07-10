@@ -343,7 +343,7 @@ namespace StardewNavigator.Features.Navigator
             {
                 if (e.Button == SButton.NumPad5)
                 {
-                    ReadHealthAndStamina(); // Alt + 5 = Leggi salute / energia
+                    ReadTile(true); // Alt + 5 = Leggi tile sotto i piedi (≡ LeftAlt + J)
                     return true;
                 }
                 if (e.Button == SButton.NumPad0)
@@ -506,9 +506,13 @@ namespace StardewNavigator.Features.Navigator
             GameLocation location = Game1.currentLocation;
             if (player == null || location == null) return;
 
+            // Ramo 1: stardew-access presente -> delega alla feature nativa.
+            if (TryDelegateReadTile(standing)) return;
+
+            // Ramo 2: fallback standalone -> replica la logica di stardew-access
             Vector2 targetTile = standing 
                 ? player.Tile 
-                : (player.GetToolLocation(ignoreClick: true) / 64f);
+                : GetFacingTile(player);
             
             targetTile.X = (int)targetTile.X;
             targetTile.Y = (int)targetTile.Y;
@@ -561,11 +565,11 @@ namespace StardewNavigator.Features.Navigator
                 {
                     string tName = tree.treeType.Value switch
                     {
-                        "1" => "Quercia",
-                        "2" => "Acero",
-                        "3" => "Pino",
-                        "6" => "Albero di Mogano",
-                        _ => "Albero"
+                        "1" => "Oak",
+                        "2" => "Maple",
+                        "3" => "Pine",
+                        "6" => "Mahogany",
+                        _ => "Tree"
                     };
                     var trans = helper.Translation.Get($"numpad-read-tile-tree-type-{tree.treeType.Value}");
                     string resolvedTreeName = trans.HasValue() ? trans.ToString() : tName;
@@ -837,6 +841,63 @@ namespace StardewNavigator.Features.Navigator
                 return (bool)(wrapListsProp?.GetValue(configObj) ?? false);
             }
             catch { return false; }
+        }
+
+        private static bool TryDelegateReadTile(bool standing)
+        {
+            var assembly = AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a => a.GetName().Name == "stardew-access");
+            if (assembly == null) return false;
+
+            try
+            {
+                var readTileType = assembly.GetType("stardew_access.Features.ReadTile");
+                if (readTileType == null)
+                {
+                    ModEntry.Monitor.Log("Failed to delegate ReadTile to stardew-access: stardew_access.Features.ReadTile class not found.", StardewModdingAPI.LogLevel.Warn);
+                    return false;
+                }
+
+                var instanceProp = readTileType.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                var instance = instanceProp?.GetValue(null);
+                if (instance == null)
+                {
+                    ModEntry.Monitor.Log("Failed to delegate ReadTile to stardew-access: ReadTile.Instance property is null.", StardewModdingAPI.LogLevel.Warn);
+                    return false;
+                }
+
+                var runMethod = instance.GetType().GetMethod("Run", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                if (runMethod == null)
+                {
+                    ModEntry.Monitor.Log("Failed to delegate ReadTile to stardew-access: ReadTile.Run method not found.", StardewModdingAPI.LogLevel.Warn);
+                    return false;
+                }
+
+                runMethod.Invoke(instance, new object[] { true, standing });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ModEntry.Monitor.Log($"Failed to delegate ReadTile to stardew-access: {ex.Message}", StardewModdingAPI.LogLevel.Warn);
+                return false;
+            }
+        }
+
+        private static Vector2 GetFacingTile(Farmer player)
+        {
+            int x = player.GetBoundingBox().Center.X;
+            int y = player.GetBoundingBox().Center.Y;
+            const int offset = 64;
+
+            switch (player.FacingDirection)
+            {
+                case 0: y -= offset; break; // Su
+                case 1: x += offset; break; // Destra
+                case 2: y += offset; break; // Giù
+                case 3: x -= offset; break; // Sinistra
+            }
+
+            return new Vector2(x / 64, y / 64);
         }
 
         private static void ReadHealthAndStamina()
