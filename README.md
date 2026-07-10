@@ -65,9 +65,11 @@ When **NumLock is ON**, the numeric keypad acts as a layered interface for movem
 - **`LeftShift + 5`**: Read current coordinates and location display name.
 - **`LeftShift + 9`**: Read active navigation route status.
 
-### 4. LeftAlt Level (Player Vitals)
+### 4. LeftAlt Level (Player Vitals & Held Item)
 - **`LeftAlt + 5`**: Read player health and stamina.
 - **`LeftAlt + 0`**: Read player health and stamina.
+- **`LeftAlt + 7`**: Read selected hotbar item (alias).
+- **`LeftAlt + 9`**: Read selected hotbar item (alias).
 
 ### 5. Utility & Scanner Controls
 - **`*` (Multiply)**: Open Inventory.

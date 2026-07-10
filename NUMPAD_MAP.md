@@ -64,12 +64,14 @@ Livello dedicato all'esplorazione virtuale tramite TileViewer, senza muovere il 
 
 ---
 
-## 5. Livello LeftAlt (Stato Vitale)
+## 5. Livello LeftAlt (Stato Vitale & Oggetto Selezionato)
 
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
 | **Alt + 5** | Leggi Salute / Energia | Emula il comando `H` di stardew-access. |
 | **Alt + 0** | Leggi Salute / Energia | Assegnazione ergonomica alternativa per le statistiche vitali. |
+| **Alt + 7** | Leggi Oggetto Impugnato | Annuncia l'oggetto attualmente selezionato nella hotbar (alias). |
+| **Alt + 9** | Leggi Oggetto Impugnato | Annuncia l'oggetto attualmente selezionato nella hotbar (alias). |
 
 ---
 
@@ -78,8 +80,7 @@ Livello dedicato all'esplorazione virtuale tramite TileViewer, senza muovere il 
 Al fine di evitare collisioni e mantenere la configurazione snella, le seguenti combinazioni **non intercettano input** e lasciano passare il comando al motore di gioco (o ad altre mod):
 
 * **Shift + 0**: Rimosso intenzionalmente. La funzione Auto-Walk è stata spostata esclusivamente su `Ctrl + 0`.
-* **Ctrl/Alt/Shift + 7**: Nessuna assegnazione. `Ctrl+7`, `Shift+7`, `Alt+7` non sono gestiti.
-* **Alt + 9**: Nessuna assegnazione. `Alt+9` non è gestito.
+* **Ctrl/Shift + 7**: Nessuna assegnazione. `Ctrl+7` e `Shift+7` non sono gestiti.
 * **Modificatori (Ctrl/Alt/Shift) + `*` (Moltiplica)**: Nessuna assegnazione. `Multiply` e `Divide` senza modificatori aprono rispettivamente Inventario e Menu Navigatore — funzioni standalone non dipendenti da stardew-access.
 * **Modificatori (Ctrl/Alt/Shift) + `/` (Dividi)**: Nessuna assegnazione.
 * **Altre combinazioni non elencate**: Se non specificato sopra, la combinazione non è gestita da NumpadController.

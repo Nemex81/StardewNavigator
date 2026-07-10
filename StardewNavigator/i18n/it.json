@@ -80,5 +80,7 @@
   "numpad-read-tile-tree-type-3": "Pino",
   "numpad-read-tile-tree-type-6": "Mogano",
   "numpad-read-tile-fruit-tree-with-name": "Albero di {{name}} (stadio {{stage}})",
-  "numpad-health-stamina": "Salute: {{health}}%, Energia: {{stamina}}%"
+  "numpad-health-stamina": "Salute: {{health}}%, Energia: {{stamina}}%",
+  "numpad-current-item": "Oggetto impugnato: {{item_name}}",
+  "numpad-current-item-empty": "Nessun oggetto selezionato"
 }

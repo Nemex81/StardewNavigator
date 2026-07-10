@@ -80,5 +80,7 @@
   "numpad-read-tile-tree-type-3": "Pine",
   "numpad-read-tile-tree-type-6": "Mahogany",
   "numpad-read-tile-fruit-tree-with-name": "{{name}} Fruit Tree (stage {{stage}})",
-  "numpad-health-stamina": "Health: {{health}}%, Stamina: {{stamina}}%"
+  "numpad-health-stamina": "Health: {{health}}%, Stamina: {{stamina}}%",
+  "numpad-current-item": "Held Item: {{item_name}}",
+  "numpad-current-item-empty": "No item selected"
 }

@@ -338,7 +338,7 @@ namespace StardewNavigator.Features.Navigator
                 }
             }
 
-            // 4. Livello LeftAlt (Stato vitale del personaggio)
+            // 4. Livello LeftAlt (Stato vitale del personaggio e oggetto impugnato)
             else if (altPressed)
             {
                 if (e.Button == SButton.NumPad5)
@@ -349,6 +349,11 @@ namespace StardewNavigator.Features.Navigator
                 if (e.Button == SButton.NumPad0)
                 {
                     ReadHealthAndStamina(); // Alt + 0 = Leggi salute / energia
+                    return true;
+                }
+                if (e.Button == SButton.NumPad7 || e.Button == SButton.NumPad9)
+                {
+                    ReadCurrentItem(); // Alt + 7 / Alt + 9 = Leggi oggetto impugnato (alias)
                     return true;
                 }
             }
@@ -844,6 +849,25 @@ namespace StardewNavigator.Features.Navigator
             int staminaPercent = player.MaxStamina > 0 ? (int)Math.Round((double)player.Stamina / player.MaxStamina * 100) : 0;
 
             string text = ModEntry.Helper.Translation.Get("numpad-health-stamina", new { health = healthPercent, stamina = staminaPercent }).ToString();
+            NavigatorSpeaker.Say(text, true);
+        }
+
+        private static void ReadCurrentItem()
+        {
+            if (!Context.IsWorldReady) return;
+            Farmer player = Game1.player;
+            if (player == null) return;
+
+            Item? currentItem = player.CurrentItem;
+            string text;
+            if (currentItem == null)
+            {
+                text = ModEntry.Helper.Translation.Get("numpad-current-item-empty").ToString();
+            }
+            else
+            {
+                text = ModEntry.Helper.Translation.Get("numpad-current-item", new { item_name = currentItem.DisplayName }).ToString();
+            }
             NavigatorSpeaker.Say(text, true);
         }
     }
