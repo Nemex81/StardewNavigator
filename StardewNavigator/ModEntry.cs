@@ -60,11 +60,6 @@ namespace StardewNavigator
                                         await Task.Delay(4000);
                                         
                                         string message = Helper.Translation.Get("update-available", new { version = latestTag }).ToString();
-                                        if (string.IsNullOrEmpty(message) || message == "update-available")
-                                        {
-                                            message = $"StardewNavigator: è disponibile la versione {latestTag}. Apri il menu opzioni per aggiornare.";
-                                        }
-
                                         NavigatorSpeaker.Say(message, interrupt: false);
                                     }
                                 }

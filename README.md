@@ -102,30 +102,4 @@ per SMAPI e ModBuildConfig, e alla community di modding di Stardew Valley.
 
 ## Changelog
 
-### v1.2.4
-- **Object Tracker Auto-Walk**: Remapped `LeftCtrl + NumPad5` to trigger Auto-Walk directly to the Object Tracker selected object (equivalent to `LeftCtrl + Home`), separating it from `LeftCtrl + NumPad0` which remains the TileViewer cursor Auto-Walk (equivalent to `LeftCtrl + Enter`).
-
-### v1.2.3
-- **Alias LeftCtrl + Enter**: Reassigned `LeftCtrl + NumPad0` to act as a virtual key press of `Enter` while `LeftCtrl` is held. This makes `LeftCtrl + NumPad0` a true alias of `LeftCtrl + Enter`, triggering Auto-Walk in the world and simulating Left Click in menus (like chest slot confirmation or Carpenter construction).
-
-### v1.2.2
-- **Key Binding Optimization**: Reassigned `LeftCtrl + NumPad5` to trigger `stardew-access` Auto-Walk to the TileViewer cursor (equivalent to `LeftCtrl + Home`, alias of `LeftCtrl + NumPad0`). This eliminates the redundancy where both `Ctrl + 5` and `Alt + 5` were mapped to reading the tile under the player's feet.
-
-### v1.2.1
-- **ReadTile Reflection & Alignment**: Delegated `NumPad5` (facing tile) and `LeftAlt + NumPad5` (standing tile) to `stardew-access` native `ReadTile` feature via reflection when present.
-- **Improved Standalone Fallback**: Aligned standalone `NumPad5` facing tile detection to mirror `stardew-access` `FacingTile` bounding box calculations exactly.
-- **Removed Italian Fallbacks**: Fixed C# tree fallback labels to use English terminology (`Oak`, `Maple`, etc.) for non-Italian language play.
-- **Cleaned Vitals Bindings**: Reserved `LeftAlt + NumPad0` as the vital statistics command, freeing `LeftAlt + NumPad5` to read the standing tile (matching `LeftAlt + J`).
-
-### v1.2.0
-- **Active Hotbar Item Reader**: Added `LeftAlt + NumPad7` and `LeftAlt + NumPad9` (alias) to announce the currently held item (TTS/HUD fallback, empty slot detection).
-- **Hotbar Slot Cycling**: Reassigned `NumPad7` and `NumPad9` base level to select the previous/next hotbar slot with circular wrapping.
-- **Utility Key Reassignments**: Mapped `NumPad0` to coordinates, `LeftCtrl+NumPad0` to Auto-Walk, `LeftAlt+NumPad0` to Vitals, `*` to Inventory, and `/` to Destinations Menu.
-- **Scanner Key Alignments**: Matched cycle controls of `+` and `-` to `PageUp` and `PageDown` modifiers of `stardew-access`.
-- **Bypassed Double Movement**: Appended Numpad keys to game settings on load for smooth native micro-movement under `LeftCtrl`.
-
-### v1.1.0
-- **Numpad Controls**: Added comprehensive keypad-driven layout for manual movement, inspection, coordinates, menu, and scanner controls (active when `NumLock` is ON).
-- **stardew-access Bridge**: Added reflection bridge to support `stardew-access` TileViewer exploration cursor and Auto-Walk scanner functionality.
-- **Usability Enhancements**: Added full mouse click support, hover state detection, and dynamic menu resizing for `NavigatorMenu`.
-- **Stability Improvement**: Wrapped JSON file reading in a generic try-catch block to prevent game startup crashes if files are locked.
+For a detailed history of all changes across versions, please refer to the [Changelog](changelog.md).

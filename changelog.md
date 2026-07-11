@@ -101,3 +101,14 @@ All notable changes to this project will be documented in this file.
 - **Locale Reloading**: Added automatic reload of translated POI and map names on the `Content.LocaleChanged` event.
 - **Co-op Double Translation**: Prevented double translation of destination display names by reloading registry keys.
 - **Fruit Tree Inspection**: Improved fruit tree inspection to announce specific tree display name.
+
+---
+
+## [1.0.0] - 2026-06-30
+
+### Added
+- **Standalone Pathfinder**: BFS pathfinding engine for multi-map navigation routing.
+- **NavigatorMenu**: Two-level interactive UI menu for selecting map and point of interest (opened with `G`).
+- **Accessibility & Screen Reader Integration**: Speaks directions/POI names via screen reader when `stardew-access` is loaded.
+- **On-Screen HUD Fallbacks**: Temporary HUD messages as a fallback for sighted/non-screen-reader players when `stardew-access` is absent.
+- **SMAPI UpdateKeys & PowerShell Installer**: Native update checking and simple script-based installation.
