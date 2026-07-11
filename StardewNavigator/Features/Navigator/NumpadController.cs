@@ -6,6 +6,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Pathfinding;
+using StardewNavigator.Integration;
 
 namespace StardewNavigator.Features.Navigator
 {
@@ -64,51 +65,18 @@ namespace StardewNavigator.Features.Navigator
             _lastCursorStepTick = 0;
         }
 
-        private static object? GetGridMovementInstance()
-        {
-            try
-            {
-                var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "stardew-access");
-                if (assembly == null) return null;
-
-                var type = assembly.GetType("stardew_access.Features.GridMovement");
-                if (type == null) return null;
-
-                var prop = type.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                return prop?.GetValue(null);
-            }
-            catch { return null; }
-        }
-
         private static bool TryDelegateGridMovement(int direction, SButton sButton)
         {
             if (_useFallbackMovement) return false;
 
-            var instance = GetGridMovementInstance();
-            if (instance == null) return false;
-
-            try
+            if (StardewAccessBridge.TryHandleGridMovement(direction, sButton))
             {
-                var method = instance.GetType().GetMethod("HandleGridMovement", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                if (method == null)
-                {
-                    Log.Warn("[StardewNavigator] Metodo HandleGridMovement non trovato su stardew-access GridMovement. Attivo fallback locale.");
-                    _useFallbackMovement = true;
-                    return false;
-                }
-
-                var key = (Microsoft.Xna.Framework.Input.Keys)sButton;
-                var inputButton = new StardewValley.InputButton(key);
-
-                method.Invoke(instance, new object[] { direction, inputButton });
                 return true;
             }
-            catch (Exception ex)
-            {
-                Log.Warn($"[StardewNavigator] Errore nell'invocazione di HandleGridMovement: {ex.Message}. Attivo fallback locale.");
-                _useFallbackMovement = true;
-                return false;
-            }
+
+            Log.Warn("[StardewNavigator] Metodo HandleGridMovement non eseguito su stardew-access. Attivo fallback locale.");
+            _useFallbackMovement = true;
+            return false;
         }
 
         public static void OnUpdateTicked(UpdateTickedEventArgs e)
@@ -219,7 +187,7 @@ namespace StardewNavigator.Features.Navigator
             // Se viene premuto un tasto scanner (Add/Subtract), verifica la presenza dell'Object Tracker di stardew-access.
             // Divide e Multiply sono funzioni standalone (menu/inventario) e non richiedono stardew-access.
             bool isScannerKey = e.Button == SButton.Add || e.Button == SButton.Subtract;
-            if (isScannerKey && GetObjectTrackerInstance() == null)
+            if (isScannerKey && !StardewAccessBridge.IsObjectTrackerAvailable())
             {
                 return false;
             }
@@ -295,15 +263,15 @@ namespace StardewNavigator.Features.Navigator
             {
                 if (ctrlPressed)
                 {
-                    TriggerObjectTrackerCycle(0, back: true); // CATEGORY Up (corresponds to Ctrl + PageUp)
+                    StardewAccessBridge.TryCycleObjectTracker(0, back: true); // CATEGORY Up (corresponds to Ctrl + PageUp)
                 }
                 else if (shiftPressed)
                 {
-                    TriggerObjectTrackerCycle(2, back: true); // IN_GROUP Up (corresponds to Shift + PageUp)
+                    StardewAccessBridge.TryCycleObjectTracker(2, back: true); // IN_GROUP Up (corresponds to Shift + PageUp)
                 }
                 else
                 {
-                    TriggerObjectTrackerCycle(1, back: true); // OBJECT_GROUP Up (corresponds to PageUp)
+                    StardewAccessBridge.TryCycleObjectTracker(1, back: true); // OBJECT_GROUP Up (corresponds to PageUp)
                 }
                 return true;
             }
@@ -311,15 +279,15 @@ namespace StardewNavigator.Features.Navigator
             {
                 if (ctrlPressed)
                 {
-                    TriggerObjectTrackerCycle(0, back: false); // CATEGORY Down (corresponds to Ctrl + PageDown)
+                    StardewAccessBridge.TryCycleObjectTracker(0, back: false); // CATEGORY Down (corresponds to Ctrl + PageDown)
                 }
                 else if (shiftPressed)
                 {
-                    TriggerObjectTrackerCycle(2, back: false); // IN_GROUP Down (corresponds to Shift + PageDown)
+                    StardewAccessBridge.TryCycleObjectTracker(2, back: false); // IN_GROUP Down (corresponds to Shift + PageDown)
                 }
                 else
                 {
-                    TriggerObjectTrackerCycle(1, back: false); // OBJECT_GROUP Down (corresponds to PageDown)
+                    StardewAccessBridge.TryCycleObjectTracker(1, back: false); // OBJECT_GROUP Down (corresponds to PageDown)
                 }
                 return true;
             }
@@ -372,7 +340,7 @@ namespace StardewNavigator.Features.Navigator
                 }
                 if (e.Button == SButton.NumPad5)
                 {
-                    TriggerObjectTrackerAction("MoveToCurrentlySelectedObject"); // Ctrl + 5 = Auto-Walk all'oggetto selezionato dell'Object Tracker (≡ LeftCtrl + Home)
+                    StardewAccessBridge.TryMoveToSelectedObject(); // Ctrl + 5 = Auto-Walk all'oggetto selezionato dell'Object Tracker (≡ LeftCtrl + Home)
                     return true;
                 }
                 if (e.Button == SButton.NumPad9)
@@ -587,7 +555,7 @@ namespace StardewNavigator.Features.Navigator
             if (player == null || location == null) return;
 
             // Ramo 1: stardew-access presente -> delega alla feature nativa.
-            if (TryDelegateReadTile(standing)) return;
+            if (StardewAccessBridge.TryReadTile(standing)) return;
 
             // Ramo 2: fallback standalone -> replica la logica di stardew-access
             Vector2 targetTile = standing 
@@ -782,46 +750,14 @@ namespace StardewNavigator.Features.Navigator
 
         // ─── Bridge Reflection per stardew-access ──────────────────────────────
 
-        private static object? GetTileViewerInstance()
-        {
-            try
-            {
-                var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "stardew-access");
-                if (assembly == null) return null;
-
-                var tileViewerType = assembly.GetType("stardew_access.Features.TileViewer");
-                if (tileViewerType == null) return null;
-
-                var instanceProp = tileViewerType.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                return instanceProp?.GetValue(null);
-            }
-            catch { return null; }
-        }
-
         private static void MoveTileViewerCursor(Vector2 delta, bool precise)
         {
-            var tvInstance = GetTileViewerInstance();
-            if (tvInstance == null) return;
-
-            try
-            {
-                var method = tvInstance.GetType().GetMethod("CursorMoveInput", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                method?.Invoke(tvInstance, new object[] { delta, precise });
-            }
-            catch { }
+            StardewAccessBridge.TryMoveTileViewerCursor(delta, precise);
         }
 
         private static void TriggerAutoWalk()
         {
-            var tvInstance = GetTileViewerInstance();
-            if (tvInstance == null) return;
-
-            try
-            {
-                var method = tvInstance.GetType().GetMethod("StartAutoWalking", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                method?.Invoke(tvInstance, null);
-            }
-            catch { }
+            StardewAccessBridge.TryStartAutoWalkToTileViewerCursor();
         }
 
         private static bool IsInMenuBuilderViewport()
@@ -848,118 +784,6 @@ namespace StardewNavigator.Features.Navigator
             catch
             {
                 return true; // fallback sicuro se la piattaforma non lo supporta
-            }
-        }
-
-        private static object? GetObjectTrackerInstance()
-        {
-            try
-            {
-                var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "stardew-access");
-                if (assembly == null) return null;
-
-                var trackerType = assembly.GetType("stardew_access.Features.ObjectTracker");
-                if (trackerType == null) return null;
-
-                var instanceProp = trackerType.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                return instanceProp?.GetValue(null);
-            }
-            catch { return null; }
-        }
-
-        private static void TriggerObjectTrackerCycle(int cycleTypeVal, bool back)
-        {
-            var otInstance = GetObjectTrackerInstance();
-            if (otInstance == null) return;
-
-            try
-            {
-                var cycleType = otInstance.GetType().GetNestedType("CycleType", System.Reflection.BindingFlags.NonPublic);
-                if (cycleType == null) return;
-
-                var cycleVal = Enum.ToObject(cycleType, cycleTypeVal);
-                bool wrapAround = GetOTWrapLists();
-
-                var method = otInstance.GetType().GetMethod("Cycle", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                method?.Invoke(otInstance, new object[] { cycleVal, back, wrapAround });
-            }
-            catch { }
-        }
-
-        private static void TriggerObjectTrackerAction(string methodName, object[]? args = null)
-        {
-            var otInstance = GetObjectTrackerInstance();
-            if (otInstance == null) return;
-
-            try
-            {
-                var method = otInstance.GetType().GetMethod(methodName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                method?.Invoke(otInstance, args);
-            }
-            catch { }
-        }
-
-        private static bool GetOTWrapLists()
-        {
-            try
-            {
-                var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "stardew-access");
-                if (assembly == null) return false;
-
-                var mainClassType = assembly.GetType("stardew_access.MainClass");
-                if (mainClassType == null) return false;
-
-                var configProp = mainClassType.GetProperty("Config", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
-                    ?? (object?)mainClassType.GetField("Config", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic) as System.Reflection.MemberInfo;
-
-                object? configObj = null;
-                if (configProp is System.Reflection.PropertyInfo pInfo) configObj = pInfo.GetValue(null);
-                else if (configProp is System.Reflection.FieldInfo fInfo) configObj = fInfo.GetValue(null);
-
-                if (configObj == null) return false;
-                var wrapListsProp = configObj.GetType().GetProperty("OTWrapLists");
-                return (bool)(wrapListsProp?.GetValue(configObj) ?? false);
-            }
-            catch { return false; }
-        }
-
-        private static bool TryDelegateReadTile(bool standing)
-        {
-            var assembly = AppDomain.CurrentDomain.GetAssemblies()
-                .FirstOrDefault(a => a.GetName().Name == "stardew-access");
-            if (assembly == null) return false;
-
-            try
-            {
-                var readTileType = assembly.GetType("stardew_access.Features.ReadTile");
-                if (readTileType == null)
-                {
-                    ModEntry.Monitor.Log("Failed to delegate ReadTile to stardew-access: stardew_access.Features.ReadTile class not found.", StardewModdingAPI.LogLevel.Warn);
-                    return false;
-                }
-
-                var instanceProp = readTileType.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                var instance = instanceProp?.GetValue(null);
-                if (instance == null)
-                {
-                    ModEntry.Monitor.Log("Failed to delegate ReadTile to stardew-access: ReadTile.Instance property is null.", StardewModdingAPI.LogLevel.Warn);
-                    return false;
-                }
-
-                var runMethod = instance.GetType().GetMethod("Run", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                if (runMethod == null)
-                {
-                    ModEntry.Monitor.Log("Failed to delegate ReadTile to stardew-access: ReadTile.Run method not found.", StardewModdingAPI.LogLevel.Warn);
-                    return false;
-                }
-
-                runMethod.Invoke(instance, new object[] { true, standing });
-                return true;
-            }
-            catch (Exception ex)
-            {
-                ModEntry.Monitor.Log($"Failed to delegate ReadTile to stardew-access: {ex.Message}", StardewModdingAPI.LogLevel.Warn);
-                return false;
             }
         }
 

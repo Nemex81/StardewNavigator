@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.9] - 2026-07-11
+
+### Refactored
+- **stardew-access Integration**: Centralized the optional stardew-access reflection bridge into a dedicated `StardewAccessBridge` component. This separates game-specific pathfinding and input handling logic from the technical details of communication via reflection.
+- **Reflection Caching**: Implemented a lazy caching strategy for stable reflection metadata (Assembly, Type, MethodInfo, PropertyInfo) to eliminate assembly lookup overhead on keypress and repeat events.
+- **Dynamic Lifecycle Handling**: Kept all runtime instances and configuration properties resolved dynamically at runtime on every call, preventing stale references or caching transient failures.
+- **Standalone Compatibility**: Maintained identical functional behavior and standalone fallbacks when stardew-access is not loaded. No changes to keybindings, menus, localizations, or user experience.
+
 ## [1.2.8] - 2026-07-10
 
 ### Fixed

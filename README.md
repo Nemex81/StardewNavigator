@@ -27,8 +27,10 @@ Opzionale: installa Stardew Access per integrazione screen reader completa.
 ## Compatibility
 - Stardew Valley 1.6+
 - SMAPI 4.0+
-- Stardew Access (opzionale — https://github.com/stardew-access/stardew-access)
 - Generic Mod Config Menu (opzionale)
+- **Stardew Access** (opzionale — https://github.com/stardew-access/stardew-access):
+  - StardewNavigator works fully in **standalone mode**, using on-screen HUD messages as fallback.
+  - When `stardew-access` is present, it is integrated via a dedicated layer (`StardewAccessBridge`). If the integration is not active or becomes unavailable during runtime, the mod automatically falls back to local standalone behaviors.
 
 ## Configuration
 
