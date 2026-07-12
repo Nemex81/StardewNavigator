@@ -223,34 +223,19 @@ namespace StardewNavigator.Features.Navigator
 
             if (!Context.IsWorldReady) return false;
 
-            // Se viene premuto un tasto scanner (Add/Subtract), verifica la presenza dell'Object Tracker di stardew-access.
-            // Divide e Multiply sono funzioni standalone (menu/inventario) e non richiedono stardew-access.
-            bool isScannerKey = e.Button == SButton.Add || e.Button == SButton.Subtract;
-            if (isScannerKey && !StardewAccessBridge.IsObjectTrackerAvailable())
-            {
-                return false;
-            }
-
             bool ctrlPressed = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
             bool shiftPressed = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
-            bool altPressed = ModEntry.Helper.Input.IsDown(SButton.LeftAlt);
             bool isPlayerFree = Context.IsPlayerFree;
             bool isInMenuBuilder = IsInMenuBuilderViewport();
 
             // ─── SPECIAL CASE: NumPad Decimal (.) = alias di Enter in qualsiasi contesto ─────────
-            // Processato PRIMA di qualsiasi guardia contestuale: funziona nel mondo, nell'inventario,
-            // nel NavigatorMenu e in qualsiasi altro menu aperto. Non richiede modificatori.
-            // SButton.Decimal (110) = '.' del tastierino numerico; diverso da OemPeriod (190).
             if (e.Button == SButton.Decimal)
             {
-                // Context non necessario: AliasEnter usa solo ModEntry.Helper.Input.Press()
                 NumpadActionCatalog.Execute(NumpadActionId.AliasEnter, new ActionContext());
                 return true;
             }
 
             // ─── SPECIAL CASE: tasti numerici quando NavigatorMenu è aperto ──────────────────────
-            // Processato PRIMA della guardia !isPlayerFree (il menu la blocca).
-            // Intercetta solo i tasti pertinenti; tutti gli altri cadono a return false.
             if (Game1.activeClickableMenu is NavigatorMenu navMenu)
             {
                 if (e.Button == SButton.NumPad8)
@@ -268,189 +253,69 @@ namespace StardewNavigator.Features.Navigator
                     navMenu.NumpadConfirm(); // Conferma selezione e avvia percorso
                     return true;
                 }
-                return false; // altri tasti numpad non intercettati nel NavigatorMenu
+                return false;
             }
 
             // ─── SPECIAL CASE: Ctrl+NumPad5 = alias Ctrl+Enter in qualsiasi altro menu aperto ────
-            // Gestisce GameMenu, inventario e altri IClickableMenu generici.
-            // Processato PRIMA della guardia !isPlayerFree (il menu la blocca).
             if (!isPlayerFree && Game1.activeClickableMenu != null && ctrlPressed && e.Button == SButton.NumPad5)
             {
-                // Context non necessario: AliasCtrlEnter usa solo ModEntry.Helper.Input.Press()
                 NumpadActionCatalog.Execute(NumpadActionId.AliasCtrlEnter, new ActionContext());
                 return true;
             }
 
+            // ─── SPECIAL CASE: Ctrl+NumPad8/2/4/6 = micro-movimento ──────────────────────────────
+            if (ctrlPressed && (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4 || e.Button == SButton.NumPad6))
+            {
+                if (navigator.IsActive)
+                {
+                    navigator.CancelNavigation("input movimento manuale");
+                }
+                return false;
+            }
+
             // Blocca l'intercettazione se il giocatore non è libero (nei menu/chat/cutscene),
-            // a meno che non si stia usando Ctrl o Shift all'interno di un menu di costruzione (es. CarpenterMenu).
+            // a meno che non si stia usando Ctrl o Shift all'interno di un menu di costruzione.
             if (!isPlayerFree && !(isInMenuBuilder && (ctrlPressed || shiftPressed)))
             {
                 return false;
             }
 
             // Build a snapshot of the current game state for use by action handlers below.
-            // Called after early-exit guards to avoid unnecessary allocations.
             ActionContext context = BuildContext(navigator, registry, routeEngine);
 
-            // 1. Comandi del tastierino per Menu e Inventario (senza modificatori)
-            if (e.Button == SButton.Divide && !ctrlPressed && !shiftPressed && !altPressed)
-            {
-                NumpadActionCatalog.Execute(NumpadActionId.OpenNavigatorMenu, context); // NumPadDivide = open destinations menu (like G)
-                return true;
-            }
-            if (e.Button == SButton.Multiply && !ctrlPressed && !shiftPressed && !altPressed)
-            {
-                NumpadActionCatalog.Execute(NumpadActionId.OpenInventory, context); // NumPadMultiply = open inventory
-                return true;
-            }
-            if (e.Button == SButton.Add)
-            {
-                NumpadActionId scannerUpId = ctrlPressed ? NumpadActionId.ScannerCategoryUp
-                                           : shiftPressed ? NumpadActionId.ScannerInGroupUp
-                                           : NumpadActionId.ScannerObjectGroupUp;
-                NumpadActionCatalog.Execute(scannerUpId, context);
-                return true;
-            }
-            if (e.Button == SButton.Subtract)
-            {
-                NumpadActionId scannerDownId = ctrlPressed ? NumpadActionId.ScannerCategoryDown
-                                             : shiftPressed ? NumpadActionId.ScannerInGroupDown
-                                             : NumpadActionId.ScannerObjectGroupDown;
-                NumpadActionCatalog.Execute(scannerDownId, context);
-                return true;
-            }
+            // Costruiamo l'InputChord corrente
+            InputChord chord = InputChord.FromCurrentInput(e.Button, ModEntry.Helper);
 
-            // 2. Livello LeftCtrl (Micro-movimento preciso ed esplorazione fisica)
-            if (ctrlPressed)
+            // Risolviamo l'azione dalla DefaultBindingTable dichiarativa
+            if (DefaultBindingTable.TryGetAction(chord, out NumpadActionId actionId))
             {
-                if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4 || e.Button == SButton.NumPad6)
+                // 1. UseTool (NumPad1): richiede cooldown check e aggiornamento ticks nel controller
+                if (actionId == NumpadActionId.UseTool)
                 {
-                    // SPECIAL CASE: Ctrl+NumPad8/2/4/6 = micro-movimento.
-                    // Annulla la navigazione attiva ma NON sopprime il tasto: il gioco gestisce
-                    // il movimento nativo pixel-per-pixel grazie a GridMovementOverrideKey=LeftControl
-                    // nella configurazione di stardew-access (vedere docs/input-management.md §2.C).
-                    if (navigator.IsActive)
+                    int currentTick = Game1.ticks;
+                    if (currentTick - _lastUseToolTick >= UseToolCooldownTicks)
                     {
-                        navigator.CancelNavigation("input movimento manuale");
+                        _lastUseToolTick = currentTick;
+                        NumpadActionCatalog.Execute(actionId, context);
                     }
-                    return false; // Non sopprimiamo, lasciamo passare il tasto per il movimento nativo
-                }
-                if (e.Button == SButton.NumPad5)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.AutoWalkToObject, context); // Ctrl + 5 = Auto-Walk all'oggetto selezionato dell'Object Tracker (≡ LeftCtrl + Home)
                     return true;
                 }
-                if (e.Button == SButton.NumPad9)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.CancelNavigation, context); // Ctrl + 9 = Annulla navigazione
-                    return true;
-                }
-                if (e.Button == SButton.NumPad0)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.AliasCtrlEnter, context); // Ctrl + 0 = Alias di LeftCtrl + Enter (Auto-Walk / Left Click)
-                    return true;
-                }
-            }
 
-            // 3. Livello LeftAlt (TileViewer, Coordinate, Stato Vitale, Oggetto Selezionato & Tile sotto i piedi)
-            else if (altPressed)
-            {
-                if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4 || e.Button == SButton.NumPad6 ||
-                    e.Button == SButton.Up || e.Button == SButton.Down || e.Button == SButton.Left || e.Button == SButton.Right)
-                {
-                    Vector2 delta = e.Button switch
-                    {
-                        SButton.NumPad8 => new Vector2(0, -64),
-                        SButton.Up => new Vector2(0, -64),
-                        SButton.NumPad2 => new Vector2(0, 64),
-                        SButton.Down => new Vector2(0, 64),
-                        SButton.NumPad4 => new Vector2(-64, 0),
-                        SButton.Left => new Vector2(-64, 0),
-                        SButton.NumPad6 => new Vector2(64, 0),
-                        SButton.Right => new Vector2(64, 0),
-                        _ => Vector2.Zero
-                    };
-
-                    if (delta != Vector2.Zero)
-                    {
-                        // Rimuove immediatamente ogni stato di movimento a griglia pendente in stardew-access
-                        // così che non si muova il personaggio basandosi sul tasto soppresso.
-                        StardewAccessBridge.TryResetGridMovementState();
-
-                        _activeCursorKey = e.Button;
-                        _activeCursorDelta = delta;
-                        _lastCursorStepTick = Game1.ticks;
-                        MoveTileViewerCursor(delta, false);
-
-                        // Supprimiamo sia il tasto fisico del tastierino che la freccia direzionale corrispondente
-                        // per prevenire movimenti del personaggio dovuti alla traduzione degli input da parte del driver/OS.
-                        if (e.Button == SButton.NumPad8 || e.Button == SButton.Up)
-                        {
-                            ModEntry.Helper.Input.Suppress(SButton.NumPad8);
-                            ModEntry.Helper.Input.Suppress(SButton.Up);
-                        }
-                        else if (e.Button == SButton.NumPad2 || e.Button == SButton.Down)
-                        {
-                            ModEntry.Helper.Input.Suppress(SButton.NumPad2);
-                            ModEntry.Helper.Input.Suppress(SButton.Down);
-                        }
-                        else if (e.Button == SButton.NumPad4 || e.Button == SButton.Left)
-                        {
-                            ModEntry.Helper.Input.Suppress(SButton.NumPad4);
-                            ModEntry.Helper.Input.Suppress(SButton.Left);
-                        }
-                        else if (e.Button == SButton.NumPad6 || e.Button == SButton.Right)
-                        {
-                            ModEntry.Helper.Input.Suppress(SButton.NumPad6);
-                            ModEntry.Helper.Input.Suppress(SButton.Right);
-                        }
-
-                        return true;
-                    }
-                }
-                if (e.Button == SButton.NumPad3)
-                {
-                    ReadTile(true); // Alt + 3 = Leggi tile sotto i piedi (≡ LeftAlt + J)
-                    return true;
-                }
-                if (e.Button == SButton.NumPad5)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.ReadCoords, context); // Alt + 5 = Leggi coordinate / posizione
-                    return true;
-                }
-                if (e.Button == SButton.NumPad7)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.ReadCurrentItem, context); // Alt + 7 = Leggi oggetto impugnato
-                    return true;
-                }
-                if (e.Button == SButton.NumPad9)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.ReadNavStatus, context); // Alt + 9 = Stato navigazione
-                    return true;
-                }
-                if (e.Button == SButton.NumPad0)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.ReadHealthStamina, context); // Alt + 0 = Leggi salute / energia
-                    return true;
-                }
-            }
-
-            // 5. Livello Base (Nessun modificatore)
-            else
-            {
-                if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad6 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4)
+                // 2. GridMove (NumPad8/2/4/6 base)
+                if (actionId == NumpadActionId.GridMoveUp || actionId == NumpadActionId.GridMoveDown ||
+                    actionId == NumpadActionId.GridMoveLeft || actionId == NumpadActionId.GridMoveRight)
                 {
                     if (navigator.IsActive)
                     {
                         navigator.CancelNavigation("input movimento manuale");
                     }
 
-                    int dir = e.Button switch
+                    int dir = actionId switch
                     {
-                        SButton.NumPad8 => 0,
-                        SButton.NumPad6 => 1,
-                        SButton.NumPad2 => 2,
-                        SButton.NumPad4 => 3,
+                        NumpadActionId.GridMoveUp => 0,
+                        NumpadActionId.GridMoveRight => 1,
+                        NumpadActionId.GridMoveDown => 2,
+                        NumpadActionId.GridMoveLeft => 3,
                         _ => -1
                     };
 
@@ -465,51 +330,72 @@ namespace StardewNavigator.Features.Navigator
                         StartContinuousMovement(e.Button, dir, Game1.ticks);
                         return true;
                     }
+                    return false;
                 }
 
-                if (e.Button == SButton.NumPad1)
+                // 3. TileViewerMove (Alt+NumPad8/2/4/6/frecce)
+                if (actionId == NumpadActionId.TileViewerMoveUp || actionId == NumpadActionId.TileViewerMoveDown ||
+                    actionId == NumpadActionId.TileViewerMoveLeft || actionId == NumpadActionId.TileViewerMoveRight)
                 {
-                    // NumPad1 = usa attrezzo (≡ X) — valido per tutti i giocatori,
-                    // con e senza stardew-access, con e senza screen reader.
-                    // Il cooldown (20 ticks ≈ 333ms a 60 FPS) impedisce attivazioni a raffica
-                    // replicando la cadenza naturale di una singola oscillazione dell'attrezzo.
-                    int currentTick = Game1.ticks;
-                    if (currentTick - _lastUseToolTick >= UseToolCooldownTicks)
+                    Vector2 delta = actionId switch
                     {
-                        _lastUseToolTick = currentTick;
-                        NumpadActionCatalog.Execute(NumpadActionId.UseTool, context);
+                        NumpadActionId.TileViewerMoveUp => new Vector2(0, -64),
+                        NumpadActionId.TileViewerMoveDown => new Vector2(0, 64),
+                        NumpadActionId.TileViewerMoveLeft => new Vector2(-64, 0),
+                        NumpadActionId.TileViewerMoveRight => new Vector2(64, 0),
+                        _ => Vector2.Zero
+                    };
+
+                    if (delta != Vector2.Zero)
+                    {
+                        StardewAccessBridge.TryResetGridMovementState();
+
+                        _activeCursorKey = e.Button;
+                        _activeCursorDelta = delta;
+                        _lastCursorStepTick = Game1.ticks;
+                        MoveTileViewerCursor(delta, false);
+
+                        if (actionId == NumpadActionId.TileViewerMoveUp)
+                        {
+                            ModEntry.Helper.Input.Suppress(SButton.NumPad8);
+                            ModEntry.Helper.Input.Suppress(SButton.Up);
+                        }
+                        else if (actionId == NumpadActionId.TileViewerMoveDown)
+                        {
+                            ModEntry.Helper.Input.Suppress(SButton.NumPad2);
+                            ModEntry.Helper.Input.Suppress(SButton.Down);
+                        }
+                        else if (actionId == NumpadActionId.TileViewerMoveLeft)
+                        {
+                            ModEntry.Helper.Input.Suppress(SButton.NumPad4);
+                            ModEntry.Helper.Input.Suppress(SButton.Left);
+                        }
+                        else if (actionId == NumpadActionId.TileViewerMoveRight)
+                        {
+                            ModEntry.Helper.Input.Suppress(SButton.NumPad6);
+                            ModEntry.Helper.Input.Suppress(SButton.Right);
+                        }
+
+                        return true;
                     }
-                    return true;
+                    return false;
                 }
-                if (e.Button == SButton.NumPad3)
+
+                // 4. ReadTile (NumPad5 base e Alt+NumPad3)
+                if (actionId == NumpadActionId.ReadTileFacing)
                 {
-                    // NumPad3 = azione / interazione (≡ tasto azione, default X).
-                    // Simula il tasto azione nativo tramite SMAPI Input.Press() per aggirare
-                    // l'intercettazione di checkAction da parte di stardew-access 1.7.0-beta.2.
-                    // Vedere docs/input-management.md §3.A e docs/stardew-access-integration.md §2.B.
-                    NumpadActionCatalog.Execute(NumpadActionId.Interact, context);
+                    ReadTile(false);
                     return true;
                 }
-                if (e.Button == SButton.NumPad5)
+                if (actionId == NumpadActionId.ReadTileStanding)
                 {
-                    ReadTile(false); // Numpad5 = leggi tile di fronte (rimane inline, Phase 2)
+                    ReadTile(true);
                     return true;
                 }
-                if (e.Button == SButton.NumPad7)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.SlotPrevious, context); // NumPad7 = slot precedente hotbar (wrapping circolare su 12 slot)
-                    return true;
-                }
-                if (e.Button == SButton.NumPad0)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.ReadCoords, context); // NumPad0 = leggi coordinate (K)
-                    return true;
-                }
-                if (e.Button == SButton.NumPad9)
-                {
-                    NumpadActionCatalog.Execute(NumpadActionId.SlotNext, context); // NumPad9 = slot successivo hotbar (wrapping circolare su 12 slot)
-                    return true;
-                }
+
+                // 5. Azioni migrate standard
+                NumpadActionCatalog.Execute(actionId, context);
+                return true;
             }
 
             return false;
