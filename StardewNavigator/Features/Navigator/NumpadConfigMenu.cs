@@ -353,14 +353,8 @@ namespace StardewNavigator.Features.Navigator
                         _visibleBindings.Clear();
                         foreach (var b in DefaultBindingTable.Bindings)
                         {
-                            if (currentProfile.TryGetAction(b.Chord, out var act) && act == b.ActionId)
+                            if (NumpadProfileRegistry.TryResolveAction(b.Chord, currentProfile, ModEntry.Config.NumpadOverrides, out var act) && act == b.ActionId)
                             {
-                                _visibleBindings.Add(b);
-                            }
-                            else if (ModEntry.Config.NumpadOverrides.TryGetValue(b.Chord.ToString(), out var name) && 
-                                     name != "None" && Enum.TryParse<NumpadActionId>(name, out var overrideAct) && overrideAct == b.ActionId)
-                            {
-                                // Include explicitly overridden custom assignments
                                 _visibleBindings.Add(b);
                             }
                         }
@@ -373,7 +367,7 @@ namespace StardewNavigator.Features.Navigator
                                 if (ov.Value != "None" && Enum.TryParse<NumpadActionId>(ov.Value, out var actId))
                                 {
                                     // Add to visible if not already in it
-                                    var chord = ParseChord(ov.Key);
+                                    var chord = InputChord.TryParse(ov.Key);
                                     if (chord.HasValue && !_visibleBindings.Any(b => b.Chord == chord.Value))
                                     {
                                         _visibleBindings.Add(new NumpadBinding(chord.Value, actId));
@@ -442,7 +436,7 @@ namespace StardewNavigator.Features.Navigator
 
         private NumpadActionId GetRuntimeAction(InputChord chord, NumpadProfile baseProfile)
         {
-            if (baseProfile.TryGetAction(chord, out var act))
+            if (NumpadProfileRegistry.TryResolveAction(chord, baseProfile, ModEntry.Config.NumpadOverrides, out var act))
             {
                 return act;
             }
@@ -614,95 +608,21 @@ namespace StardewNavigator.Features.Navigator
                 tempOverrides[chordString] = targetActionName;
             }
 
-            // Validazione Invarianti: verifichiamo che tutte le azioni critiche siano coperte
-            var tempConfig = new ModConfig
+            // Validazione delegata al resolver centralizzato (disaccoppiamento logica di business da UI)
+            var baseProfile = NumpadProfileRegistry.GetProfile(ModEntry.Config.ActiveNumpadProfile);
+            if (!NumpadProfileRegistry.ValidateOverrides(baseProfile, tempOverrides, out var unmappedCriticalAction))
             {
-                ActiveNumpadProfile = ModEntry.Config.ActiveNumpadProfile,
-                NumpadOverrides = tempOverrides
-            };
-
-            var criticalActions = new[] {
-                NumpadActionId.GridMoveUp,
-                NumpadActionId.GridMoveDown,
-                NumpadActionId.GridMoveLeft,
-                NumpadActionId.GridMoveRight,
-                NumpadActionId.OpenNavigatorMenu
-            };
-
-            foreach (var act in criticalActions)
-            {
-                bool isCovered = false;
-                foreach (var b in DefaultBindingTable.Bindings)
-                {
-                    if (TryGetActionSimulated(b.Chord, tempConfig, out var resolvedAct) && resolvedAct == act)
-                    {
-                        isCovered = true;
-                        break;
-                    }
-                }
-
-                if (!isCovered)
-                {
-                    // Errore critico bloccante
-                    string actionLabel = NumpadActionMetadata.GetDescription(act);
-                    string errMsg = ModEntry.Helper.Translation.Get("numpad-err-critical-unmapped", new { action = actionLabel }).ToString();
-                    NavigatorSpeaker.Say(errMsg, true);
-                    return false;
-                }
+                // Errore critico bloccante
+                string actionLabel = NumpadActionMetadata.GetDescription(unmappedCriticalAction);
+                string errMsg = ModEntry.Helper.Translation.Get("numpad-err-critical-unmapped", new { action = actionLabel }).ToString();
+                NavigatorSpeaker.Say(errMsg, true);
+                return false;
             }
 
             // Consolidamento modifiche
             ModEntry.Config.NumpadOverrides = tempOverrides;
             ModEntry.Helper.WriteConfig(ModEntry.Config);
             return true;
-        }
-
-        private bool TryGetActionSimulated(InputChord chord, ModConfig config, out NumpadActionId actionId)
-        {
-            string chordString = chord.ToString();
-            if (config.NumpadOverrides.TryGetValue(chordString, out string? actionName))
-            {
-                if (actionName == "None")
-                {
-                    actionId = NumpadActionId.None;
-                    return true;
-                }
-                if (Enum.TryParse<NumpadActionId>(actionName, out var parsedAction))
-                {
-                    actionId = parsedAction;
-                    return true;
-                }
-            }
-            return NumpadProfileRegistry.GetProfile(config.ActiveNumpadProfile).TryGetAction(chord, out actionId);
-        }
-
-        private InputChord? ParseChord(string chordStr)
-        {
-            // Helper semplice per convertire il formato stringa a InputChord
-            try
-            {
-                if (chordStr.Contains("+"))
-                {
-                    var parts = chordStr.Split('+');
-                    if (parts.Length == 2)
-                    {
-                        if (Enum.TryParse<ModifierFlags>(parts[0], out var modifiers) &&
-                            Enum.TryParse<SButton>(parts[1], out var key))
-                        {
-                            return new InputChord(key, modifiers);
-                        }
-                    }
-                }
-                else
-                {
-                    if (Enum.TryParse<SButton>(chordStr, out var key))
-                    {
-                        return new InputChord(key);
-                    }
-                }
-            }
-            catch { }
-            return null;
         }
 
         // ─── Accessibility Vocalizations ──────────────────────────────────────────

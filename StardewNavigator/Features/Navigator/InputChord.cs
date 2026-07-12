@@ -59,6 +59,37 @@ namespace StardewNavigator.Features.Navigator
         public override string ToString() => Modifiers == ModifierFlags.None
             ? Key.ToString()
             : $"{Modifiers}+{Key}";
+
+        /// <summary>
+        /// Attempts to parse an InputChord from its string representation.
+        /// </summary>
+        public static InputChord? TryParse(string chordStr)
+        {
+            try
+            {
+                if (chordStr.Contains("+"))
+                {
+                    var parts = chordStr.Split('+');
+                    if (parts.Length == 2)
+                    {
+                        if (Enum.TryParse<ModifierFlags>(parts[0], out var modifiers) &&
+                            Enum.TryParse<SButton>(parts[1], out var key))
+                        {
+                            return new InputChord(key, modifiers);
+                        }
+                    }
+                }
+                else
+                {
+                    if (Enum.TryParse<SButton>(chordStr, out var key))
+                    {
+                        return new InputChord(key);
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
     }
 
     /// <summary>

@@ -288,7 +288,7 @@ namespace StardewNavigator.Features.Navigator
 
             // Risolviamo l'azione dal profilo attivo corrente
             var profile = NumpadProfileRegistry.GetProfile(ModEntry.Config.ActiveNumpadProfile);
-            if (profile.TryGetAction(chord, out NumpadActionId actionId))
+            if (NumpadProfileRegistry.TryResolveAction(chord, profile, ModEntry.Config.NumpadOverrides, out NumpadActionId actionId))
             {
                 if (actionId == NumpadActionId.None)
                 {
