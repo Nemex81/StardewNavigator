@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StardewNavigator.Features.Navigator
 {
@@ -16,14 +17,34 @@ namespace StardewNavigator.Features.Navigator
         );
 
         /// <summary>
-        /// Sighted profile placeholder: currently initialized as a copy of the default binding set.
-        /// It serves as a structural placeholder to prevent runtime errors and unexpected behavior,
-        /// introducing no real behavioral difference until its product semantics are defined.
+        /// Sighted profile: contains only base movement, interaction, hotbar slots,
+        /// inventory, navigator menu, cancel navigation, and navigation status feedback.
+        /// Excludes all other screen-reader specific readouts, Object Tracker controls,
+        /// and TileViewer movements.
         /// </summary>
         public static readonly NumpadProfile Sighted = new NumpadProfile(
             NumpadProfileId.Sighted,
-            DefaultBindingTable.Bindings
+            GetSightedBindings()
         );
+
+        private static IEnumerable<NumpadBinding> GetSightedBindings()
+        {
+            // Filtro inclusivo (whitelist) basato sull'analisi architetturale approvata
+            return DefaultBindingTable.Bindings.Where(b =>
+                b.ActionId == NumpadActionId.GridMoveUp ||
+                b.ActionId == NumpadActionId.GridMoveDown ||
+                b.ActionId == NumpadActionId.GridMoveLeft ||
+                b.ActionId == NumpadActionId.GridMoveRight ||
+                b.ActionId == NumpadActionId.UseTool ||
+                b.ActionId == NumpadActionId.Interact ||
+                b.ActionId == NumpadActionId.SlotPrevious ||
+                b.ActionId == NumpadActionId.SlotNext ||
+                b.ActionId == NumpadActionId.OpenInventory ||
+                b.ActionId == NumpadActionId.OpenNavigatorMenu ||
+                b.ActionId == NumpadActionId.CancelNavigation ||
+                b.ActionId == NumpadActionId.ReadNavStatus
+            );
+        }
 
         /// <summary>
         /// Resolves a profile instance from its identifier.
