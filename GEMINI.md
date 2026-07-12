@@ -17,12 +17,7 @@ This document provides context, architectural constraints, rules, and workflows 
   - `Pathoschild.Stardew.ModBuildConfig` (compilazione e deploy automatico)
 - **Integrazioni (Soft Dependency)**:
   - **stardew-access** (Unique ID SMAPI: `shoaib.stardewaccess` o `stardew.access`): Se rilevato all'avvio del gioco nel registro mod SMAPI, il navigatore indirizza le istruzioni vocali direttamente allo screen reader tramite riflessione (reflection) per evitare accoppiamenti forti a livello di codice compilato.
-    - *Contratto di Reflection Attuale* (osservato e da preservare, modificabile solo con test e approvazione esplicita):
-      * Assembly target: `"stardew-access"`
-      * Classe: `stardew_access.MainClass`
-      * Proprietà statica: `ScreenReader` (ritorna l'istanza dello screen reader)
-      * Metodo istanza: `Say` con firma `void Say(string text, bool interrupt)`
-      * Sicurezza runtime: La riflessione deve essere protetta da un blocco `try-catch` ed eseguire il caching tramite un flag `reflectionAttempted` per evitare tentativi ripetuti falliti ad ogni tick.
+    - I dettagli sull'architettura della Reflection, sui contratti osservati e sul bridge dinamico sono delegati al documento tecnico `@./docs/stardew-access-integration.md`.
   - **Generic Mod Config Menu (GMCM)**: Se rilevato, espone le opzioni di configurazione nel menu impostazioni in-game.
 
 ---
@@ -92,7 +87,7 @@ Per installare, aggiornare o disinstallare manualmente il mod in locale, fare do
 - **Never** committare file machine-specific o configurazioni locali come `StardewNavigator.csproj.user` o `installer/config.json` (già ignorati in `.gitignore`). Se un file machine-specific o temporaneo (es. `StardewNavigator.csproj.user`, `installer/config.json`, cartelle `bin/`, `obj/`) viene tracciato per errore, va rimosso dall'indice di git usando `git rm --cached <file>`.
 - **Must** utilizzare **Conventional Commits** in **lingua inglese** per ogni commit (es. `feat: ...`, `fix: ...`). I messaggi non devono essere generici e devono descrivere chiaramente il cambiamento.
 - **Must** localizzare i testi tramite chiavi i18n standard di SMAPI (in `i18n/default.json`). Non inserire stringhe hardcoded nel codice C# o nel file `navigator_destinations.json`.
-- **Never** invocare direttamente librerie di `stardew-access` a tempo di compilazione. Qualsiasi interazione deve passare attraverso la reflection implementata in `NavigatorSpeaker.cs`.
+- **Never** invocare direttamente librerie di `stardew-access` a tempo di compilazione. Qualsiasi interazione deve passare attraverso la reflection centralizzata in `StardewAccessBridge.cs`. `NavigatorSpeaker.cs` è esclusivamente un wrapper chiamante per l'output vocale, non il componente centrale del bridge.
 - **Always** chiedere chiarimenti all'utente prima di effettuare grandi refactoring o cambiamenti all'algoritmo di routing BFS.
 
 ---
@@ -140,7 +135,21 @@ Per pubblicare una nuova versione del mod, attenersi rigorosamente alla seguente
 
 ## 7. Stato attuale e prossimi passi
 
-- **Versione Corrente**: `1.0.1` (tracciata nel manifest.json).
+- **Versione Corrente**: `1.2.11` (tracciata nel manifest.json).
 - **Prossimi punti di attenzione**:
   - Validare il funzionamento dell'installer PowerShell su diverse configurazioni di Windows ExecutionPolicy.
   - Monitorare la reattività del check aggiornamenti asincrono all'avvio in condizioni di scarsa connettività di rete.
+
+---
+
+## 8. Indice della documentazione tecnica interna (docs/)
+
+Per mantenere questo file conciso ed evitare letture non necessarie ad ogni turno di lavoro dell'agente, i dettagli implementativi specifici sono organizzati in documenti tecnici specializzati sotto la cartella `docs/`. L'agente è tenuto a leggere ed applicare tali indicazioni nei seguenti casi:
+
+* **Task che coinvolgono il comportamento condizionale con stardew-access**:
+  - Documento da consultare: `@./docs/stardew-access-integration.md`
+  - Ambiti coperti: Modifiche a `StardewAccessBridge.cs`, logiche di integrazione, gestione di GridMovement, TileViewer, ObjectTracker, output vocale (TTS), Reflection o input simulato.
+
+* **Task relativi all'input, modificatori, scorciatoie, o all'interazione con l'ambiente**:
+  - Documento da consultare: `@./docs/input-management.md`
+  - Ambiti coperti: Modifiche a `NumpadController.cs`, tasti modificatori (`Ctrl`, `Alt`, `Shift`), soppressione, rate-limiting, cooldown o interazioni con NVDA/AltGr.

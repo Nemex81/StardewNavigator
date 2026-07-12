@@ -1,0 +1,63 @@
+# Gestione degli Input, Modificatori e Prevenzione Conflitti
+
+Questo documento descrive in dettaglio le convenzioni tecniche per l'elaborazione dell'input di `StardewNavigator`, la gestione dei tasti modificatori, il comportamento dell'input simulato e le protezioni contro le collisioni con i lettori di schermo esterni.
+
+---
+
+## 1. Gestione dei Modificatori ed Evitamento Collisioni
+
+L'assegnazione e la combinazione dei tasti modificatori (`LeftCtrl`, `LeftAlt`, `LeftShift`) in `NumpadController.cs` risponde a precisi requisiti fisici e software di accessibilità:
+
+### A. AltGr / RightAlt (Contratto del Progetto)
+* **Regola**: Il mod riconosce ed elabora come modificatore di ispezione **esclusivamente** il tasto `LeftAlt` (`SButton.LeftAlt`).
+* **Vincolo Tecnico**: I tasti `RightAlt` ed `AltGr` (`SButton.RightAlt`) devono essere intenzionalmente ignorati e lasciati passare inalterati al sistema operativo. Questo previene collisioni con tastiere internazionali ed europee (inclusa quella italiana) che utilizzano la combinazione `AltGr` per comporre caratteri speciali (come parentesi, chiocciole, ecc.).
+
+### B. Gestione Conflitti LeftShift e NVDA (Regola di Sviluppo)
+* **Contesto e Storico**: Inizialmente i comandi del cursore di ispezione e le letture ambientali secondarie risiedevano sul livello `LeftShift + NumPad`. Questi sono stati migrati al livello `LeftAlt + NumPad`.
+* **Motivazione NVDA**: Il lettore dello schermo NVDA (ampiamente utilizzato da giocatori non vedenti) riserva per default le combinazioni `Shift + NumPad` per il controllo del proprio "review cursor" a livello di sistema operativo. Tenere premuto Shift sul tastierino in-game creava conflitti di input bloccanti.
+* **Obbligo di Analisi**: Non vi è un divieto assoluto di utilizzo del modificatore `Shift + NumPad`. Tuttavia, prima di assegnare o ripristinare in futuro qualsiasi binding facente uso di `Shift + NumPad`, è tassativo:
+  1. Eseguire un'analisi formale dei potenziali conflitti con le scorciatoie predefinite di NVDA e JAWS.
+  2. Valutare la raggiungibilità ergonomica a una sola mano per i giocatori con disabilità motorie o visive.
+  3. Effettuare test di validazione in-game con una sessione NVDA attiva in background.
+
+---
+
+## 2. Cattura dell'Input e Soppressione Proattiva
+
+Per garantire che le funzioni di accessibilità non provochino movimenti involontari del personaggio, StardewNavigator adotta una tecnica a due livelli:
+
+### A. Priorità dell'Evento (Contratto del Progetto)
+In `NavigatorFeature.cs`, l'evento di SMAPI `ButtonPressed` è decorato con l'attributo `[EventPriority(EventPriority.High)]`. Questo assicura che il gestore di StardewNavigator esamini l'input per primo e possa richiamare `Helper.Input.Suppress(e.Button)` per cancellare l'input prima che altre mod (con priorità standard o bassa) o il gioco stesso reagiscano ad esso.
+
+### B. Soppressione Proattiva a livello di Frame (Comportamento Osservato)
+* **Comportamento**: In `NumpadController.OnUpdateTicked`, se `LeftAlt` è tenuto premuto, viene invocata preventivamente la soppressione su base frame (`Suppress`) dei tasti direzionali (`NumPad8/2/4/6` e `Up/Down/Left/Right`).
+* **Motivazione**: Poiché `stardew-access` viene caricato da SMAPI prima di `StardewNavigator`, il suo gestore `ButtonPressed` nativo viene talvolta notificato prima del nostro, catturando l'evento e avviando il movimento. Sopprimendo proattivamente i tasti a livello di tick prima che l'evento SMAPI venga distribuito, si azzera lo stato dell'input a livello globale per qualsiasi altra mod.
+
+### C. Accoppiamento implicito con `GridMovementOverrideKey` (Comportamento Osservato)
+* **Contesto**: Il micro-movimento fluido del personaggio (`LeftCtrl + NumPad 8/2/4/6`) funziona perché, nella configurazione di default di stardew-access, `GridMovementOverrideKey` è impostato su `LeftControl`. Finché `LeftCtrl` è premuto, stardew-access disattiva il grid snap, lasciando che il gioco gestisca il movimento nativo pixel-per-pixel.
+* **Natura dell'accoppiamento**: Questo è un accoppiamento osservato sulla **configurazione** di stardew-access, non sul suo codice interno. Non è accessibile o controllabile via reflection da StardewNavigator.
+* **Guardia anti-regressione**: Se l'utente modifica `GridMovementOverrideKey` nel `config.json` di stardew-access, il comportamento percepito del micro-movimento cambierà silenziosamente: il personaggio si muoverà a griglia invece che in modo fluido, senza alcun messaggio di errore. Questa dipendenza non deve essere trattata come una garanzia stabile. Qualsiasi modifica futura al livello `LeftCtrl` di StardewNavigator deve includere una verifica esplicita della coesistenza con il grid movement.
+
+---
+
+## 3. Simulazione di Input e Cooldown
+
+Per innescare le azioni di gioco tramite il tastierino, simuliamo fisicamente gli input in modo controllato:
+
+### A. Interazione / Azione (NumPad3)
+* **Comportamento Osservato (stardew-access v1.7.0-beta.2)**: stardew-access intercetta le chiamate dirette a `Game1.currentLocation.checkAction` o `checkForAction` eseguite da mod esterne e restituisce `false` (bloccando l'apertura di casse/bauli).
+* **Soluzione (Contratto del Progetto)**: In `NumpadController.cs`, l'azione di `NumPad3` simula la pressione del pulsante fisico nativo `SButton.X` tramite `ModEntry.Helper.Input.Press(SButton.X)`. Questo aggira il blocco e permette al ciclo nativo di gioco di eseguire l'azione in modo del tutto analogo a un click fisico.
+
+### B. Cooldown su Uso Attrezzi (NumPad1)
+* **Contratto del Progetto**: L'uso dell'attrezzo tramite `NumPad1` deve possedere un cooldown integrato per prevenire attivazioni a raffica incontrollate (rapid-fire) che consumerebbero l'energia del giocatore in pochi istanti.
+* **Comportamento Standalone**: Quando stardew-access non è attivo, viene applicato un cooldown logico manuale di **20 ticks** (~333 ms a 60 FPS, tempo stimato per un'animazione singola dell'attrezzo) memorizzato in `_lastUseToolTick`. Se stardew-access è attivo, la mod delega la gestione del rate-limiting alla simulazione interna dell'input.
+
+---
+
+## 4. Checklist di Verifica dell'Input
+
+L'agente deve convalidare ogni modifica ai binding fisici con questi controlli:
+
+1. **AltGr Passthrough**: Avviare il gioco con layout di tastiera italiano. Verificare che la pressione di `AltGr` non provochi comportamenti imprevisti di ispezione e che il tasto agisca normalmente (es. se digitando in chat).
+2. **Coesistenza NVDA**: Avviare NVDA sul PC. Verificare che i comandi `LeftAlt + NumPad` vengano intercettati dalla mod e non scatenino i controlli del review cursor di NVDA.
+3. **Coerenza Standalone**: Rimuovere stardew-access. Verificare che `NumPad1` (Usa attrezzo) rispetti il cooldown di 20 tick e non consenta l'uso rapido continuo del tool tenendo premuto il tasto.
