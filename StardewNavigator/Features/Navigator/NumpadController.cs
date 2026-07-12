@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -85,11 +86,48 @@ namespace StardewNavigator.Features.Navigator
             if (!IsNumLockActive()) return;
             if (!Context.IsWorldReady) return;
 
-            // 2. Gestione Repeat Cursore (LeftShift)
+            // ── Soppressione proattiva Alt+Direzione ──────────────────────────────────────────
+            // stardew-access carica prima di StardewNavigator, quindi il suo handler ButtonPressed
+            // riceve l'evento prima del nostro. Per NumPad2/Down (movimento giù) questo causa
+            // il movimento del personaggio prima che il nostro handler possa sopprimerlo.
+            // Soluzione: soppressione ogni tick quando LeftAlt è premuto, PRIMA che ButtonPressed
+            // venga distribuito. Questo blocca il tasto a livello di input state per tutti i mod.
+            bool altDown = ModEntry.Helper.Input.IsDown(SButton.LeftAlt);
+            if (altDown && Context.IsPlayerFree)
+            {
+                // Resetta lo stato di GridMovement di stardew-access per evitare che consideri
+                // i tasti soppressi come ancora premuti (stardew-access controlla IsSuppressed).
+                StardewAccessBridge.TryResetGridMovementState();
+
+                // Per ogni direzione: se il tasto numpad O la freccia corrispondente è premuta,
+                // sopprimi entrambi per bloccare il movimento prima che stardew-access li veda.
+                if (ModEntry.Helper.Input.IsDown(SButton.NumPad2) || ModEntry.Helper.Input.IsDown(SButton.Down))
+                {
+                    ModEntry.Helper.Input.Suppress(SButton.NumPad2);
+                    ModEntry.Helper.Input.Suppress(SButton.Down);
+                }
+                if (ModEntry.Helper.Input.IsDown(SButton.NumPad8) || ModEntry.Helper.Input.IsDown(SButton.Up))
+                {
+                    ModEntry.Helper.Input.Suppress(SButton.NumPad8);
+                    ModEntry.Helper.Input.Suppress(SButton.Up);
+                }
+                if (ModEntry.Helper.Input.IsDown(SButton.NumPad4) || ModEntry.Helper.Input.IsDown(SButton.Left))
+                {
+                    ModEntry.Helper.Input.Suppress(SButton.NumPad4);
+                    ModEntry.Helper.Input.Suppress(SButton.Left);
+                }
+                if (ModEntry.Helper.Input.IsDown(SButton.NumPad6) || ModEntry.Helper.Input.IsDown(SButton.Right))
+                {
+                    ModEntry.Helper.Input.Suppress(SButton.NumPad6);
+                    ModEntry.Helper.Input.Suppress(SButton.Right);
+                }
+            }
+
+            // 2. Gestione Repeat Cursore (LeftAlt)
             if (_activeCursorKey != SButton.None)
             {
-                bool shiftPressed = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
-                if (!Context.IsPlayerFree || !ModEntry.Helper.Input.IsDown(_activeCursorKey) || !shiftPressed)
+                bool altPressed = ModEntry.Helper.Input.IsDown(SButton.LeftAlt);
+                if (!Context.IsPlayerFree || !ModEntry.Helper.Input.IsDown(_activeCursorKey) || !altPressed)
                 {
                     ResetCursorMovement();
                 }
@@ -121,10 +159,11 @@ namespace StardewNavigator.Features.Navigator
                 return;
             }
 
-            // Se viene premuto Ctrl o Shift, interrompiamo il movimento continuo locale a griglia
+            // Se viene premuto Ctrl, Shift o Alt, interrompiamo il movimento continuo locale a griglia
             bool ctrlPressedNow = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
             bool shiftPressedNow = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
-            if (ctrlPressedNow || shiftPressedNow)
+            bool altPressedNow = ModEntry.Helper.Input.IsDown(SButton.LeftAlt);
+            if (ctrlPressedNow || shiftPressedNow || altPressedNow)
             {
                 ResetMovement();
                 return;
@@ -194,7 +233,7 @@ namespace StardewNavigator.Features.Navigator
 
             bool ctrlPressed = ModEntry.Helper.Input.IsDown(SButton.LeftControl) || ModEntry.Helper.Input.IsDown(SButton.RightControl);
             bool shiftPressed = ModEntry.Helper.Input.IsDown(SButton.LeftShift) || ModEntry.Helper.Input.IsDown(SButton.RightShift);
-            bool altPressed = ModEntry.Helper.Input.IsDown(SButton.LeftAlt) || ModEntry.Helper.Input.IsDown(SButton.RightAlt);
+            bool altPressed = ModEntry.Helper.Input.IsDown(SButton.LeftAlt);
             bool isPlayerFree = Context.IsPlayerFree;
             bool isInMenuBuilder = IsInMenuBuilderViewport();
 
@@ -292,43 +331,8 @@ namespace StardewNavigator.Features.Navigator
                 return true;
             }
 
-            // 2. Livello LeftShift (Cursore TileViewer ed esplorazione spaziale)
-            if (shiftPressed)
-            {
-                if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4 || e.Button == SButton.NumPad6)
-                {
-                    Vector2 delta = e.Button switch
-                    {
-                        SButton.NumPad8 => new Vector2(0, -64),
-                        SButton.NumPad2 => new Vector2(0, 64),
-                        SButton.NumPad4 => new Vector2(-64, 0),
-                        SButton.NumPad6 => new Vector2(64, 0),
-                        _ => Vector2.Zero
-                    };
-
-                    if (delta != Vector2.Zero)
-                    {
-                        _activeCursorKey = e.Button;
-                        _activeCursorDelta = delta;
-                        _lastCursorStepTick = Game1.ticks;
-                        MoveTileViewerCursor(delta, false);
-                        return true;
-                    }
-                }
-                if (e.Button == SButton.NumPad5)
-                {
-                    ReadCoords(); // Shift + 5 = Leggi coordinate / posizione
-                    return true;
-                }
-                if (e.Button == SButton.NumPad9)
-                {
-                    ReadNavStatus(navigator); // Shift + 9 = Stato navigazione
-                    return true;
-                }
-            }
-
-            // 3. Livello LeftCtrl (Micro-movimento preciso ed esplorazione fisica)
-            else if (ctrlPressed)
+            // 2. Livello LeftCtrl (Micro-movimento preciso ed esplorazione fisica)
+            if (ctrlPressed)
             {
                 if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4 || e.Button == SButton.NumPad6)
                 {
@@ -355,22 +359,85 @@ namespace StardewNavigator.Features.Navigator
                 }
             }
 
-            // 4. Livello LeftAlt (Stato vitale del personaggio e oggetto impugnato)
+            // 3. Livello LeftAlt (TileViewer, Coordinate, Stato Vitale, Oggetto Selezionato & Tile sotto i piedi)
             else if (altPressed)
             {
+                if (e.Button == SButton.NumPad8 || e.Button == SButton.NumPad2 || e.Button == SButton.NumPad4 || e.Button == SButton.NumPad6 ||
+                    e.Button == SButton.Up || e.Button == SButton.Down || e.Button == SButton.Left || e.Button == SButton.Right)
+                {
+                    Vector2 delta = e.Button switch
+                    {
+                        SButton.NumPad8 => new Vector2(0, -64),
+                        SButton.Up => new Vector2(0, -64),
+                        SButton.NumPad2 => new Vector2(0, 64),
+                        SButton.Down => new Vector2(0, 64),
+                        SButton.NumPad4 => new Vector2(-64, 0),
+                        SButton.Left => new Vector2(-64, 0),
+                        SButton.NumPad6 => new Vector2(64, 0),
+                        SButton.Right => new Vector2(64, 0),
+                        _ => Vector2.Zero
+                    };
+
+                    if (delta != Vector2.Zero)
+                    {
+                        // Rimuove immediatamente ogni stato di movimento a griglia pendente in stardew-access
+                        // così che non si muova il personaggio basandosi sul tasto soppresso.
+                        StardewAccessBridge.TryResetGridMovementState();
+
+                        _activeCursorKey = e.Button;
+                        _activeCursorDelta = delta;
+                        _lastCursorStepTick = Game1.ticks;
+                        MoveTileViewerCursor(delta, false);
+
+                        // Supprimiamo sia il tasto fisico del tastierino che la freccia direzionale corrispondente
+                        // per prevenire movimenti del personaggio dovuti alla traduzione degli input da parte del driver/OS.
+                        if (e.Button == SButton.NumPad8 || e.Button == SButton.Up)
+                        {
+                            ModEntry.Helper.Input.Suppress(SButton.NumPad8);
+                            ModEntry.Helper.Input.Suppress(SButton.Up);
+                        }
+                        else if (e.Button == SButton.NumPad2 || e.Button == SButton.Down)
+                        {
+                            ModEntry.Helper.Input.Suppress(SButton.NumPad2);
+                            ModEntry.Helper.Input.Suppress(SButton.Down);
+                        }
+                        else if (e.Button == SButton.NumPad4 || e.Button == SButton.Left)
+                        {
+                            ModEntry.Helper.Input.Suppress(SButton.NumPad4);
+                            ModEntry.Helper.Input.Suppress(SButton.Left);
+                        }
+                        else if (e.Button == SButton.NumPad6 || e.Button == SButton.Right)
+                        {
+                            ModEntry.Helper.Input.Suppress(SButton.NumPad6);
+                            ModEntry.Helper.Input.Suppress(SButton.Right);
+                        }
+
+                        return true;
+                    }
+                }
+                if (e.Button == SButton.NumPad3)
+                {
+                    ReadTile(true); // Alt + 3 = Leggi tile sotto i piedi (≡ LeftAlt + J)
+                    return true;
+                }
                 if (e.Button == SButton.NumPad5)
                 {
-                    ReadTile(true); // Alt + 5 = Leggi tile sotto i piedi (≡ LeftAlt + J)
+                    ReadCoords(); // Alt + 5 = Leggi coordinate / posizione
+                    return true;
+                }
+                if (e.Button == SButton.NumPad7)
+                {
+                    ReadCurrentItem(); // Alt + 7 = Leggi oggetto impugnato
+                    return true;
+                }
+                if (e.Button == SButton.NumPad9)
+                {
+                    ReadNavStatus(navigator); // Alt + 9 = Stato navigazione
                     return true;
                 }
                 if (e.Button == SButton.NumPad0)
                 {
                     ReadHealthAndStamina(); // Alt + 0 = Leggi salute / energia
-                    return true;
-                }
-                if (e.Button == SButton.NumPad7 || e.Button == SButton.NumPad9)
-                {
-                    ReadCurrentItem(); // Alt + 7 / Alt + 9 = Leggi oggetto impugnato (alias)
                     return true;
                 }
             }
@@ -423,31 +490,19 @@ namespace StardewNavigator.Features.Navigator
                 }
                 if (e.Button == SButton.NumPad3)
                 {
-                    // NumPad3 = azione / interazione (≡ C in stardew-access)
-                    // Strategia: invoca location.checkAction() direttamente sulla tile di fronte
-                    // al giocatore, esattamente come fa stardew-access in GridMovement.cs.
-                    // Questo garantisce il funzionamento con bauli, NPC, oggetti interattivi.
-                    // Fallback: pressActionButton con GetKeyboardState() (stato XNA grezzo)
-                    // per porte speciali, eventi ed edge cases.
-                    var _player = Game1.player;
-                    var _location = Game1.currentLocation;
-                    bool actionHandled = false;
-                    if (_player != null && _location != null)
-                    {
-                        int fd = _player.FacingDirection;
-                        int ax = (int)_player.Tile.X + (fd == 1 ? 1 : fd == 3 ? -1 : 0);
-                        int ay = (int)_player.Tile.Y + (fd == 2 ? 1 : fd == 0 ? -1 : 0);
-                        var actionLoc = new xTile.Dimensions.Location(ax * 64, ay * 64);
-                        actionHandled = _location.checkAction(actionLoc, Game1.viewport, _player);
-                    }
-                    if (!actionHandled)
-                    {
-                        // Fallback: pressActionButton con stato tastiera XNA grezzo
-                        Game1.pressActionButton(
-                            Game1.GetKeyboardState(),
-                            Game1.input.GetMouseState(),
-                            Game1.input.GetGamePadState());
-                    }
+                    // NumPad3 = azione / interazione (≡ tasto azione, default X)
+                    // checkAction / checkForAction sono intercettati da stardew-access 1.7.0-beta.2
+                    // e restituiscono false per i bauli. La strategia corretta è simulare la
+                    // pressione del tasto azione configurato (X) tramite SMAPI Input.Press(),
+                    // che lo inietta nello stato SMAPI. Al tick successivo, il loop nativo del gioco
+                    // vedrà X come premuto, eseguirà pressActionButton con il keyState corretto,
+                    // e tutta la pipeline di interazione (bauli, NPC, porte, oggetti) funzionerà.
+                    // Simula il tasto azione nativo (default: X) tramite SMAPI Input.Press().
+                    // Viene iniettato nello stato input; il loop nativo lo elabora al tick successivo
+                    // con la pipeline corretta: bauli, NPC, porte, oggetti interattivi.
+                    // Evita checkAction/checkForAction che vengono intercettati da stardew-access
+                    // 1.7.0-beta.2 e restituiscono false per i bauli.
+                    ModEntry.Helper.Input.Press(SButton.X);
                     return true;
                 }
                 if (e.Button == SButton.NumPad5)

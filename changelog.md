@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.11] - 2026-07-12
+
+### Fixed
+- **NumPad3 Interaction**: Resolved an issue where chest interactions via `NumPad3` were blocked by stardew-access 1.7.0 beta 2. Implemented simulation of native `SButton.X` press to reliably trigger interactions.
+- **Alt + Cursor Movement Override**: Fixed a critical bug where holding `LeftAlt` while pressing directional arrows or Numpad movement keys (e.g. `NumPad2`) to move the TileViewer cursor would still trigger player movement. We now actively clear stardew-access's internal grid movement state (`LastGridMovementButtonPressed` and `LastGridMovementDirection`) via reflection to prevent it from erroneously acting on suppressed keys.
+
+## [1.2.10] - 2026-07-12
+
+### Changed
+- **Numpad Modifier Layer Migration**: Migrated the `LeftShift + NumPad1..9` modifier layer to `LeftAlt + NumPad1..9` to avoid conflicts with NVDA screen reader review cursor controls.
+- **Keybinding Reallocations**:
+  - `Alt + NumPad8, 2, 4, 6` now moves the TileViewer cursor (migrated from Shift).
+  - `Alt + NumPad3` now reads the standing tile (moved from Alt+5).
+  - `Alt + NumPad5` now reads the player coordinates (migrated from Shift+5).
+  - `Alt + NumPad7` now reads the held item (remains as the sole binding for this action).
+  - `Alt + NumPad9` now reads the navigation status (migrated from Shift+9; the previous Alt+9 held item alias has been removed).
+  - `Alt + NumPad0` remains unchanged (reads health/stamina).
+- **International AltGr Support**: Configured Alt layer shortcuts to exclusively recognize `LeftAlt` (not `RightAlt`/AltGr) to prevent layout conflicts on international keyboards.
+
 ## [1.2.9] - 2026-07-11
 
 ### Refactored

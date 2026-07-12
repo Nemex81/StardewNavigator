@@ -42,6 +42,8 @@ namespace StardewNavigator.Integration
 
         private static MemberInfo? _configMember;
         private static PropertyInfo? _otWrapListsProp;
+        private static FieldInfo? _lastGridMovementButtonPressedField;
+        private static FieldInfo? _lastGridMovementDirectionField;
 
         /// <summary>
         /// Ritorna true se stardew-access è caricato nel gioco.
@@ -399,6 +401,37 @@ namespace StardewNavigator.Integration
             catch (Exception ex)
             {
                 Log.Warn($"[StardewAccessBridge] Failed to delegate ReadTile to stardew-access: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Resetta lo stato del movimento a griglia di stardew-access per fermare movimenti errati causati da soppressione.
+        /// </summary>
+        public static bool TryResetGridMovementState()
+        {
+            if (!IsModLoaded) return false;
+            try
+            {
+                var type = GetType("stardew_access.Features.GridMovement", ref _gridMovementType);
+                if (type == null) return false;
+
+                if (_lastGridMovementButtonPressedField == null)
+                {
+                    _lastGridMovementButtonPressedField = type.GetField("LastGridMovementButtonPressed", BindingFlags.NonPublic | BindingFlags.Static);
+                }
+                if (_lastGridMovementDirectionField == null)
+                {
+                    _lastGridMovementDirectionField = type.GetField("LastGridMovementDirection", BindingFlags.NonPublic | BindingFlags.Static);
+                }
+
+                _lastGridMovementButtonPressedField?.SetValue(null, null);
+                _lastGridMovementDirectionField?.SetValue(null, null);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Warn($"[StardewAccessBridge] Errore in TryResetGridMovementState: {ex.Message}");
                 return false;
             }
         }

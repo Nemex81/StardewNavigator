@@ -2,7 +2,7 @@
 
 Questo documento descrive in dettaglio la mappatura completa dei comandi assegnati al tastierino numerico da StardewNavigator. Questi comandi sono attivi solo quando il **NumLock è ATTIVO** e il giocatore è libero (non sta digitando in chat e, generalmente, non è all'interno di un menu, ad eccezione del menu di costruzione dove alcuni controlli sono consentiti).
 
-La mappatura è strutturata in livelli ("layers") accessibili tramite l'uso di tasti modificatori (`LeftCtrl`, `LeftShift`, `LeftAlt`).
+La mappatura è strutturata in livelli ("layers") accessibili tramite l'uso di tasti modificatori (`LeftCtrl` e `LeftAlt`, oltre a `LeftShift` per i soli controlli dello scanner).
 
 ---
 
@@ -75,28 +75,32 @@ Livello dedicato al controllo fisico fluido e alla gestione del navigatore.
 
 ---
 
-## 4. Livello LeftShift (Esplorazione Spaziale)
+## 4. Livello LeftShift (Scanner)
 
-Livello dedicato all'esplorazione virtuale tramite TileViewer, senza muovere il personaggio.
+Livello utilizzato esclusivamente per lo scanner dell'Object Tracker:
 
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
-| **Shift + 8, 2, 4, 6** | Muovi cursore TileViewer | Sposta il cursore di esplorazione di 64px nella direzione scelta. |
-| **Shift + 5** | Leggi Coordinate | Rilegge posizione e display name. |
-| **Shift + 9** | Stato Navigazione | Annuncia lo stato della route in corso. |
 | **Shift + `+`** | Ciclo Scanner: Oggetto in Gruppo (Su)| Speculare a `LeftShift + PageUp`. |
 | **Shift + `-`** | Ciclo Scanner: Oggetto in Gruppo (Giù)| Speculare a `LeftShift + PageDown`. |
 
+> [!IMPORTANT]
+> I precedenti comandi del livello `LeftShift + NumPad1..9` sono stati migrati al livello `LeftAlt` per evitare conflitti con gli shortcut di lettura dello screen reader NVDA.
+
 ---
 
-## 5. Livello LeftAlt (Stato Vitale, Oggetto Selezionato & Tile sotto i piedi)
+## 5. Livello LeftAlt (TileViewer, Coordinate, Stato Vitale, Oggetto Selezionato & Tile sotto i piedi)
+
+Questo livello è stato riorganizzato per includere i comandi del TileViewer e delle coordinate (migrati da Shift), risolvendo i conflitti con NVDA.
 
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
-| **Alt + 5** | Leggi Tile sotto i piedi | Emula il comando `LeftAlt + J` di stardew-access. |
+| **Alt + 8, 2, 4, 6** | Muovi cursore TileViewer | Sposta il cursore di esplorazione di 64px nella direzione scelta. |
+| **Alt + 3** | Leggi Tile sotto i piedi | Emula il comando `LeftAlt + J` di stardew-access (spostato da Alt+5 per evitare conflitti). |
+| **Alt + 5** | Leggi Coordinate | Rilegge posizione e display name (spostato da Shift+5). |
+| **Alt + 7** | Leggi Oggetto Impugnato | Annuncia l'oggetto attualmente selezionato nella hotbar (unico binding rimasto). |
+| **Alt + 9** | Stato Navigazione | Annuncia lo stato della route in corso (spostato da Shift+9; il precedente binding Alt+9 per l'oggetto impugnato è stato rimosso). |
 | **Alt + 0** | Leggi Salute / Energia | Assegnazione ergonomica alternativa per le statistiche vitali. |
-| **Alt + 7** | Leggi Oggetto Impugnato | Annuncia l'oggetto attualmente selezionato nella hotbar (alias). |
-| **Alt + 9** | Leggi Oggetto Impugnato | Annuncia l'oggetto attualmente selezionato nella hotbar (alias). |
 
 ---
 

@@ -71,16 +71,13 @@ When the Navigator Menu is active, the numpad provides direct navigation without
 - **`LeftCtrl + 9`**: Cancel active navigation.
 - **`LeftCtrl + 0`**: Alias of `LeftCtrl + Enter` (simulates Left Click in menus / Carpenter construction, and triggers Auto-Walk in the world).
 
-### 3. LeftShift Level (Tile Cursor & Navigation)
-- **`LeftShift + 8, 2, 4, 6`**: Move `stardew-access` TileViewer cursor.
-- **`LeftShift + 5`**: Read current coordinates and location display name.
-- **`LeftShift + 9`**: Read active navigation route status.
-
-### 4. LeftAlt Level (Player Vitals, Held Item & Standing Tile)
-- **`LeftAlt + 5`**: Read standing tile (equivalent to `LeftAlt + J` in stardew-access).
+### 3. LeftAlt Level (Tile Cursor, Coordinate, Vitals & Navigation)
+- **`LeftAlt + 8, 2, 4, 6`**: Move `stardew-access` TileViewer cursor (migrated from LeftShift to avoid conflicts with NVDA).
+- **`LeftAlt + 3`**: Read standing tile (equivalent to `LeftAlt + J` in stardew-access; moved from Alt+5).
+- **`LeftAlt + 5`**: Read current coordinates and location display name (moved from Shift+5).
+- **`LeftAlt + 7`**: Read selected hotbar item (remained only on Alt+7; Alt+9 was reassigned).
+- **`LeftAlt + 9`**: Read active navigation route status (moved from Shift+9).
 - **`LeftAlt + 0`**: Read player health and stamina (vital stats).
-- **`LeftAlt + 7`**: Read selected hotbar item (alias).
-- **`LeftAlt + 9`**: Read selected hotbar item (alias).
 
 ### 5. Utility & Scanner Controls
 - **`*` (Multiply)**: Open Inventory.

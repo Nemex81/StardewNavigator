@@ -79,6 +79,7 @@ namespace StardewNavigator.Features.Navigator
             NumpadController.OnUpdateTicked(e);
         }
 
+        [EventPriority(EventPriority.High)]
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady) return;
