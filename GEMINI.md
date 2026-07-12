@@ -86,7 +86,7 @@ Per installare, aggiornare o disinstallare manualmente il mod in locale, fare do
 - **Always** garantire 0 errori e 0 avvisi (inclusi sia compiler warnings sia static analyzer warnings) nella build locale di Release prima di committare, taggare o pushare modifiche.
 - **Never** committare file machine-specific o configurazioni locali come `StardewNavigator.csproj.user` o `installer/config.json` (già ignorati in `.gitignore`). Se un file machine-specific o temporaneo (es. `StardewNavigator.csproj.user`, `installer/config.json`, cartelle `bin/`, `obj/`) viene tracciato per errore, va rimosso dall'indice di git usando `git rm --cached <file>`.
 - **Must** utilizzare **Conventional Commits** in **lingua inglese** per ogni commit (es. `feat: ...`, `fix: ...`). I messaggi non devono essere generici e devono descrivere chiaramente il cambiamento.
-- **Must** localizzare i testi tramite chiavi i18n standard di SMAPI (in `i18n/default.json`). Non inserire stringhe hardcoded nel codice C# o nel file `navigator_destinations.json`.
+- **Must** localizzare i testi tramite chiavi i18n standard di SMAPI. Ogni nuova chiave deve essere aggiunta contestualmente sia in `i18n/default.json` (EN) sia in `i18n/it.json` (IT). La parità delle chiavi tra i due file è obbligatoria e verificabile via `git diff i18n/`. Non inserire stringhe hardcoded nel codice C#. Per le convenzioni di naming, i token di interpolazione e il workflow completo, consultare `@./docs/localization.md`.
 - **Never** invocare direttamente librerie di `stardew-access` a tempo di compilazione. Qualsiasi interazione deve passare attraverso la reflection centralizzata in `StardewAccessBridge.cs`. `NavigatorSpeaker.cs` è esclusivamente un wrapper chiamante per l'output vocale, non il componente centrale del bridge.
 - **Always** chiedere chiarimenti all'utente prima di effettuare grandi refactoring o cambiamenti all'algoritmo di routing BFS.
 
@@ -153,3 +153,7 @@ Per mantenere questo file conciso ed evitare letture non necessarie ad ogni turn
 * **Task relativi all'input, modificatori, scorciatoie, o all'interazione con l'ambiente**:
   - Documento da consultare: `@./docs/input-management.md`
   - Ambiti coperti: Modifiche a `NumpadController.cs`, tasti modificatori (`Ctrl`, `Alt`, `Shift`), soppressione, rate-limiting, cooldown o interazioni con NVDA/AltGr.
+
+* **Task che coinvolgono stringhe UI, messaggi vocali, nomi di destinazioni o configurazione GMCM**:
+  - Documento da consultare: `@./docs/localization.md`
+  - Ambiti coperti: Aggiunta o modifica di chiavi in `i18n/default.json` e `i18n/it.json`, aggiunta di destinazioni in `navigator_destinations.json`, uso di `Helper.Translation.Get()`, token di interpolazione `{{...}}`.
