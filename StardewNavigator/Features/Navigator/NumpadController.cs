@@ -290,6 +290,10 @@ namespace StardewNavigator.Features.Navigator
             var profile = NumpadProfileRegistry.GetProfile(ModEntry.Config.ActiveNumpadProfile);
             if (profile.TryGetAction(chord, out NumpadActionId actionId))
             {
+                if (actionId == NumpadActionId.None)
+                {
+                    return IsNumpadKey(chord.Key);
+                }
                 // 1. UseTool (NumPad1): richiede cooldown check e aggiornamento ticks nel controller
                 if (actionId == NumpadActionId.UseTool)
                 {
@@ -701,6 +705,12 @@ namespace StardewNavigator.Features.Navigator
             return new Vector2(x / 64, y / 64);
         }
 
-
+        private static bool IsNumpadKey(SButton key)
+        {
+            return key >= SButton.NumPad0 && key <= SButton.NumPad9 ||
+                   key == SButton.Add || key == SButton.Subtract ||
+                   key == SButton.Multiply || key == SButton.Divide ||
+                   key == SButton.Decimal;
+        }
     }
 }

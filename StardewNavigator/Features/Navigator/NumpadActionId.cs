@@ -10,6 +10,9 @@ namespace StardewNavigator.Features.Navigator
     /// </summary>
     public enum NumpadActionId
     {
+        // ── Special value for unmapped / disabled keys ───────────────────────────
+        None = 0,
+
         // ── Grid movement (delegated to stardew-access, with local fallback) ─────
         GridMoveUp,
         GridMoveDown,

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewNavigator.Features.Navigator;
@@ -21,5 +22,8 @@ namespace StardewNavigator
 
         // Profilo dei tasti del tastierino numerico attivo (default: Blind)
         public NumpadProfileId ActiveNumpadProfile { get; set; } = NumpadProfileId.Blind;
+
+        // Mappature custom dei tasti fisici ad azioni semantiche (es. "NumPad5" -> "ReadCoords")
+        public Dictionary<string, string> NumpadOverrides { get; set; } = new();
     }
 }

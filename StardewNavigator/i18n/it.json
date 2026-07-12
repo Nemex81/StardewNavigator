@@ -121,6 +121,12 @@
   "numpad-action-desc-ScannerCategoryUp": "Scanner: categoria successiva",
   "numpad-action-desc-ScannerCategoryDown": "Scanner: categoria precedente",
   "numpad-action-desc-ScannerInGroupUp": "Scanner: oggetto successivo",
-  "numpad-action-desc-ScannerInGroupDown": "Scanner: oggetto precedente"
+  "numpad-action-desc-ScannerInGroupDown": "Scanner: oggetto precedente",
+  "numpad-config-disable-label": "Disattiva Tasto",
+  "numpad-config-restore-label": "Ripristina Default",
+  "numpad-err-critical-unmapped": "L'azione critica {{action}} non è assegnata! Assegnala prima di salvare.",
+  "numpad-err-reserved-key": "Questo tasto è riservato alle funzioni di sistema.",
+  "numpad-info-binding-moved": "{{action}} spostata su {{newKey}}.",
+  "numpad-info-reset-complete": "Tasti del tastierino ripristinati ai valori predefiniti."
 }
 
