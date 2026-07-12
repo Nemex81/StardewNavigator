@@ -62,11 +62,6 @@ namespace StardewNavigator.Features.Navigator
         /// </summary>
         public override void receiveKeyPress(Keys key)
         {
-            if (_maps.Count == 0)
-            {
-                if (key == Keys.Escape) exitThisMenu();
-                return;
-            }
 
             switch (key)
             {

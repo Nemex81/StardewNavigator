@@ -249,7 +249,9 @@ namespace StardewNavigator.Features.Navigator
         {
             if (_currentLevel == MenuLevel.Level1)
             {
-                return ModEntry.Helper.Translation.Get("numpad-config-title").ToString();
+                string baseTitle = ModEntry.Helper.Translation.Get("numpad-config-title").ToString();
+                string profileName = ModEntry.Config.ActiveNumpadProfile.ToString();
+                return $"{baseTitle} ({profileName})";
             }
 
             return _categoryIndex switch
