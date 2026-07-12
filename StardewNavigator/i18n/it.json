@@ -57,6 +57,8 @@
   "nav.poi.woods_clearing": "Radura",
   "config.numpad-active.name": "Controlli tastierino attivi",
   "config.numpad-active.tooltip": "Abilita il movimento discreto e le scorciatoie di navigazione sul tastierino numerico (Numpad).",
+  "config.numpad-profile.name": "Profilo Tastierino",
+  "config.numpad-profile.tooltip": "Scegli tra il profilo Blind (feedback completo dello screen reader) e Sighted (feedback minimale su HUD).",
   "numpad-coords": "Posizione: {{location_name}} a X {{x}}, Y {{y}}",
   "numpad-nav-status-active": "Navigazione attiva per {{poi_name}} in {{location_name}}. Mancano {{steps}} passi.",
   "numpad-nav-status-inactive": "La navigazione non è attiva.",

@@ -122,6 +122,20 @@ namespace StardewNavigator
                     getValue: () => Config.NumpadControlsActive,
                     setValue: value => Config.NumpadControlsActive = value
                 );
+
+                configMenu.AddTextOption(
+                    mod: ModManifest,
+                    name: () => Helper.Translation.Get("config.numpad-profile.name"),
+                    tooltip: () => Helper.Translation.Get("config.numpad-profile.tooltip"),
+                    getValue: () => Config.ActiveNumpadProfile.ToString(),
+                    setValue: value => {
+                        if (Enum.TryParse<NumpadProfileId>(value, out var profileId))
+                        {
+                            Config.ActiveNumpadProfile = profileId;
+                        }
+                    },
+                    allowedValues: new[] { "Blind", "Sighted" }
+                );
             }
         }
     }
@@ -132,5 +146,6 @@ namespace StardewNavigator
         void AddKeybindList(IManifest mod, Func<KeybindList> getValue, Action<KeybindList> setValue, Func<string> name, Func<string>? tooltip = null, string? fieldId = null);
         void AddNumberOption(IManifest mod, Func<float> getValue, Action<float> setValue, Func<string> name, Func<string>? tooltip = null, float? min = null, float? max = null, float? interval = null, Func<float, string>? formatVal = null, string? fieldId = null);
         void AddBoolOption(IManifest mod, Func<bool> getValue, Action<bool> setValue, Func<string> name, Func<string>? tooltip = null, string? fieldId = null);
+        void AddTextOption(IManifest mod, Func<string> getValue, Action<string> setValue, Func<string> name, Func<string>? tooltip = null, string[]? allowedValues = null, Func<string, string>? formatAllowedValue = null, string? fieldId = null);
     }
 }

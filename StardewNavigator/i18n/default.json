@@ -57,6 +57,8 @@
   "nav.poi.woods_clearing": "Clearing",
   "config.numpad-active.name": "Numpad controls active",
   "config.numpad-active.tooltip": "Enables movement and navigation shortcuts on the numeric keypad.",
+  "config.numpad-profile.name": "Numpad Profile",
+  "config.numpad-profile.tooltip": "Choose between Blind (full screen reader feedback) and Sighted (minimalist, HUD-based feedback) profiles.",
   "numpad-coords": "Location: {{location_name}} at X {{x}}, Y {{y}}",
   "numpad-nav-status-active": "Navigation active for {{poi_name}} in {{location_name}}. {{steps}} steps remaining.",
   "numpad-nav-status-inactive": "Navigation is not active.",
