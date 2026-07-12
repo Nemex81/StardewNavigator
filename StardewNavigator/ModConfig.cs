@@ -1,5 +1,6 @@
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
+using StardewNavigator.Features.Navigator;
 
 namespace StardewNavigator
 {
@@ -17,5 +18,8 @@ namespace StardewNavigator
 
         // Abilita i controlli tramite tastierino numerico (Numpad)
         public bool NumpadControlsActive { get; set; } = true;
+
+        // Profilo dei tasti del tastierino numerico attivo (default: Blind)
+        public NumpadProfileId ActiveNumpadProfile { get; set; } = NumpadProfileId.Blind;
     }
 }

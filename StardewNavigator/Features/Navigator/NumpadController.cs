@@ -286,8 +286,9 @@ namespace StardewNavigator.Features.Navigator
             // Costruiamo l'InputChord corrente
             InputChord chord = InputChord.FromCurrentInput(e.Button, ModEntry.Helper);
 
-            // Risolviamo l'azione dalla DefaultBindingTable dichiarativa
-            if (DefaultBindingTable.TryGetAction(chord, out NumpadActionId actionId))
+            // Risolviamo l'azione dal profilo attivo corrente
+            var profile = NumpadProfileRegistry.GetProfile(ModEntry.Config.ActiveNumpadProfile);
+            if (profile.TryGetAction(chord, out NumpadActionId actionId))
             {
                 // 1. UseTool (NumPad1): richiede cooldown check e aggiornamento ticks nel controller
                 if (actionId == NumpadActionId.UseTool)
