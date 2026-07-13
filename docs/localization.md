@@ -47,7 +47,7 @@ Etichette e tooltip esposti nel menu GMCM (Generic Mod Config Menu). Convenziona
 Esempi: `config.navigator-menu-key.name`, `config.hud-duration.tooltip`.
 
 ### `numpad-*`
-Stringhe di feedback vocale e HUD generate da `NumpadController.cs`. Includono sia messaggi di stato che stringhe di lettura tile e output di coordinate.
+Stringhe di feedback vocale ed HUD generate ed utilizzate dal sottosistema del tastierino numerico (`NumpadController.cs`, `TileInspector.cs`, `GridMovement.cs`, `NumpadActionCatalog.cs`, `NumpadConfigMenu.cs`). Includono sia messaggi di stato che stringhe di lettura tile ed output di coordinate.
 
 Esempi: `numpad-coords`, `numpad-read-tile-water`, `numpad-health-stamina`.
 
