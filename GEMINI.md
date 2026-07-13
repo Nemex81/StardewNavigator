@@ -174,3 +174,8 @@ Per mantenere questo file conciso ed evitare letture non necessarie ad ogni turn
 * **Task che coinvolgono stringhe UI, messaggi vocali, nomi di destinazioni o configurazione GMCM**:
   - Documento da consultare: `@./docs/localization.md`
   - Ambiti coperti: Aggiunta o modifica di chiavi in `i18n/default.json` e `i18n/it.json`, aggiunta di destinazioni in `navigator_destinations.json`, uso di `Helper.Translation.Get()`, token di interpolazione `{{...}}`.
+
+* **Task che comportano modifiche significative, refactoring o riassegnazione di responsabilità**:
+  - Documento da consultare: `@./docs/documentation-maintenance.md`
+  - Ambiti coperti: Regole di manutenzione della documentazione, flussi di audit e allineamento codice-istruzioni, gestione delle discrepanze.
+
