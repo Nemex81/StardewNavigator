@@ -38,9 +38,9 @@ namespace StardewNavigator.Features.Navigator
             System.Action<string> onSpeak)
             : base(
                 x: Game1.uiViewport.Width / 2 - 300,
-                y: Game1.uiViewport.Height / 2 - (Math.Min(maps.Count + 1, MaxVisibleItems) * ItemHeight / 2) - MenuPadding,
+                y: Game1.uiViewport.Height / 2 - (Math.Min(maps.Count, MaxVisibleItems) * ItemHeight / 2) - MenuPadding,
                 width: 600,
-                height: Math.Min(maps.Count + 1, MaxVisibleItems) * ItemHeight + MenuPadding * 2 + TitleHeight,
+                height: Math.Min(maps.Count, MaxVisibleItems) * ItemHeight + MenuPadding * 2 + TitleHeight,
                 showUpperRightCloseButton: true)
         {
             _maps = maps;
@@ -176,9 +176,8 @@ namespace StardewNavigator.Features.Navigator
         {
             if (_currentLevel == MenuLevel.Level1)
             {
-                var names = new List<string>(_maps.Count + 1);
+                var names = new List<string>(_maps.Count);
                 foreach (var m in _maps) names.Add(m.MapDisplayName);
-                names.Add(ModEntry.Helper.Translation.Get("menu-navigator-configure-numpad").ToString());
                 return names;
             }
             else
@@ -194,12 +193,9 @@ namespace StardewNavigator.Features.Navigator
         {
             if (_currentLevel == MenuLevel.Level1)
             {
-                int totalItems = _maps.Count + 1;
-                _mapIndex = (_mapIndex + direction + totalItems) % totalItems;
-                if (_mapIndex < _maps.Count)
-                    _onSpeak(CurrentMap.MapDisplayName);
-                else
-                    _onSpeak(ModEntry.Helper.Translation.Get("menu-navigator-configure-numpad").ToString());
+                if (_maps.Count == 0) return;
+                _mapIndex = (_mapIndex + direction + _maps.Count) % _maps.Count;
+                _onSpeak(CurrentMap.MapDisplayName);
             }
             else
             {
@@ -212,16 +208,10 @@ namespace StardewNavigator.Features.Navigator
 
         private void ConfirmSelection()
         {
+            if (_maps.Count == 0) return;
+
             if (_currentLevel == MenuLevel.Level1)
             {
-                if (_mapIndex == _maps.Count)
-                {
-                    // Special item "Configure Numpad"
-                    exitThisMenu();
-                    Game1.activeClickableMenu = new NumpadConfigMenu();
-                    return;
-                }
-
                 var map = CurrentMap;
                 var poi = map.PointsOfInterest;
 
@@ -293,7 +283,7 @@ namespace StardewNavigator.Features.Navigator
 
         private void ResizeForLevel1()
         {
-            int visibleItems = Math.Min(_maps.Count + 1, MaxVisibleItems);
+            int visibleItems = Math.Min(_maps.Count, MaxVisibleItems);
             height = visibleItems * ItemHeight + MenuPadding * 2 + TitleHeight;
             yPositionOnScreen = Game1.uiViewport.Height / 2 - height / 2;
         }
@@ -379,10 +369,7 @@ namespace StardewNavigator.Features.Navigator
                             if (_mapIndex != hoveredIdx)
                             {
                                 _mapIndex = hoveredIdx;
-                                if (_mapIndex < _maps.Count)
-                                    _onSpeak(CurrentMap.MapDisplayName);
-                                else
-                                    _onSpeak(ModEntry.Helper.Translation.Get("menu-navigator-configure-numpad").ToString());
+                                _onSpeak(CurrentMap.MapDisplayName);
                             }
                         }
                         else
