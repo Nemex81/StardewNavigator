@@ -35,6 +35,7 @@ Il repository è strutturato come segue:
   - [Log.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Log.cs): Gestore di logging interno che rimanda alla console di monitoraggio di SMAPI.
   - [Features/Navigator/](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/):
     - [Navigator.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/Navigator.cs): State machine principale che controlla le fasi di pathfinding e la transizione tra warp.
+    - [NavigatorSpatialHelper.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NavigatorSpatialHelper.cs): Helper spaziale per calcolo dimensioni mappa, collisioni runtime e ricerca tile passabile vicino ai warp.
     - [RouteEngine.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/RouteEngine.cs): Algoritmo BFS per la generazione dei grafi multimappa basato sulle porte degli edifici e sui warps di gioco.
     - [NavigatorMenu.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NavigatorMenu.cs): UI in-game testuale, navigabile e compatibile con screen reader per selezionare le destinazioni.
     - [DestinationRegistry.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/DestinationRegistry.cs): Registro che carica e compila i POI dal JSON delle destinazioni.
