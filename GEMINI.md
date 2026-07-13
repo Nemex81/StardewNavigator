@@ -30,14 +30,21 @@ Il repository è strutturato come segue:
 - [StardewNavigator/](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/)
   - [StardewNavigator.csproj](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/StardewNavigator.csproj): Progetto SMAPI standard.
   - [ModEntry.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/ModEntry.cs): Entry point. Gestisce il caricamento, la registrazione agli eventi di gioco (ButtonPressed, Warped, SaveLoaded) e l'inizializzazione del controllo aggiornamenti asincrono.
-  - [ModConfig.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/ModConfig.cs): Modello di configurazione del mod (tasto di menu, durata messaggi HUD, controllo aggiornamenti all'avvio).
-  - [NavigatorSpeaker.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/NavigatorSpeaker.cs): Wrapper per la sintesi vocale. Invia l'output a `stardew-access` via reflection o ripiega su un `HUDMessage` in-game per giocatori normovedenti.
+  - [ModConfig.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/ModConfig.cs): Modello di configurazione del mod (tasto di menu, profili attivi, overrides e controllo aggiornamenti all'avvio).
+  - [NavigatorSpeaker.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/NavigatorSpeaker.cs): Wrapper per la sintesi vocale. Invia l'output a `stardew-access` via reflection o ripiega sul sintetizzatore vocale interno (SAPI) in modalità standalone.
   - [Log.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Log.cs): Gestore di logging interno che rimanda alla console di monitoraggio di SMAPI.
   - [Features/Navigator/](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/):
     - [Navigator.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/Navigator.cs): State machine principale che controlla le fasi di pathfinding e la transizione tra warp.
     - [RouteEngine.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/RouteEngine.cs): Algoritmo BFS per la generazione dei grafi multimappa basato sulle porte degli edifici e sui warps di gioco.
     - [NavigatorMenu.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NavigatorMenu.cs): UI in-game testuale, navigabile e compatibile con screen reader per selezionare le destinazioni.
     - [DestinationRegistry.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/DestinationRegistry.cs): Registro che carica e compila i POI dal JSON delle destinazioni.
+    - [NumpadController.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NumpadController.cs): Dispatcher di runtime e gestore della ripetizione continua (repeat) e del timing.
+    - [TileInspector.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/TileInspector.cs): Gestore standalone di ispezione delle tile (descrizioni ambientali).
+    - [GridMovement.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/GridMovement.cs): Gestore standalone dei singoli passi fisici a griglia del personaggio.
+    - [NumpadActionCatalog.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NumpadActionCatalog.cs): Catalogo delle azioni semantiche eseguibili dal tastierino.
+    - [NumpadProfileRegistry.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NumpadProfileRegistry.cs): Registro dei profili predefiniti (Blind/Sighted) e degli override dinamici.
+    - [NumpadConfigMenu.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NumpadConfigMenu.cs): Menu in-game per la personalizzazione interattiva dei tasti.
+    - [InputChord.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/InputChord.cs): Rappresentazione delle combinazioni di tasti e tasti modificatori.
   - [assets/](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/assets/):
     - [navigator_destinations.json](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/assets/navigator_destinations.json): Registro strutturato con chiavi i18n per le mappe e i punti di interesse calcolabili.
   - [i18n/](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/i18n/): File JSON standard SMAPI per la localizzazione (`default.json`, `it.json`).
@@ -87,7 +94,7 @@ Per installare, aggiornare o disinstallare manualmente il mod in locale, fare do
 - **Never** committare file machine-specific o configurazioni locali come `StardewNavigator.csproj.user` o `installer/config.json` (già ignorati in `.gitignore`). Se un file machine-specific o temporaneo (es. `StardewNavigator.csproj.user`, `installer/config.json`, cartelle `bin/`, `obj/`) viene tracciato per errore, va rimosso dall'indice di git usando `git rm --cached <file>`.
 - **Must** utilizzare **Conventional Commits** in **lingua inglese** per ogni commit (es. `feat: ...`, `fix: ...`). I messaggi non devono essere generici e devono descrivere chiaramente il cambiamento.
 - **Must** localizzare i testi tramite chiavi i18n standard di SMAPI. Ogni nuova chiave deve essere aggiunta contestualmente sia in `i18n/default.json` (EN) sia in `i18n/it.json` (IT). La parità delle chiavi tra i due file è obbligatoria e verificabile via `git diff i18n/`. Non inserire stringhe hardcoded nel codice C#. Per le convenzioni di naming, i token di interpolazione e il workflow completo, consultare `@./docs/localization.md`.
-- **Never** invocare direttamente librerie di `stardew-access` a tempo di compilazione. Qualsiasi interazione deve passare attraverso la reflection centralizzata in `StardewAccessBridge.cs`. `NavigatorSpeaker.cs` è esclusivamente un wrapper chiamante per l'output vocale, non il componente centrale del bridge.
+- **Never** invocare direttamente librerie di `stardew-access` a tempo di compilazione. Qualsiasi interazione deve passare attraverso la reflection centralizzata in `StardewAccessBridge.cs`. Le logiche di fallback standalone (ispezione tile e movimenti a griglia) devono risiedere esclusivamente in `TileInspector.cs` e `GridMovement.cs`. `NavigatorSpeaker.cs` è esclusivamente un wrapper chiamante per l'output vocale, non il componente centrale del bridge.
 - **Always** chiedere chiarimenti all'utente prima di effettuare grandi refactoring o cambiamenti all'algoritmo di routing BFS.
 
 ---
@@ -98,7 +105,7 @@ Per installare, aggiornare o disinstallare manualmente il mod in locale, fare do
 Per mantenere il codice semplice, i file `navigator_destinations.json` contengono le sole chiavi i18n (es. `"nav.map.farm"`). `DestinationRegistry.cs` risolve e sostituisce queste chiavi con le stringhe localizzate corrispondenti a runtime all'interno del metodo `ResolveCoordinates()`, eseguito ad ogni caricamento di partita (`SaveLoaded`).
 
 ### In-Game Update Checking
-All'avvio del gioco, se `CheckForUpdatesOnStartup` è attivo, `ModEntry.cs` esegue una chiamata asincrona non bloccante via `Task.Run` all'API GitHub per recuperare l'ultima release. In caso di aggiornamento disponibile, viene notificato al giocatore in-game sia visivamente (HUDMessage) che acusticamente (`NavigatorSpeaker.Say`).
+All'avvio del gioco, se `CheckForUpdatesOnStartup` è attivo, `ModEntry.cs` esegue una chiamata asincrona non bloccante via `Task.Run` all'API GitHub per recuperare l'ultima release. In caso di aggiornamento disponibile, viene notificato al giocatore in-game acusticamente (`NavigatorSpeaker.Say`) e registrato nei log di SMAPI.
 
 ---
 
@@ -120,7 +127,7 @@ Per pubblicare una nuova versione del mod, attenersi rigorosamente alla seguente
 1. **Bump Versione**: Aggiornare il campo `"Version"` nel file `StardewNavigator/manifest.json`.
 2. **Build Release**: Eseguire il build locale in configurazione Release per generare lo zip del pacchetto:
    `dotnet build StardewNavigator.sln --configuration Release`
-   Il file zip verrà posizionato in `StardewNavigator/bin/Release/net6.0/StardewNavigator [Versione].zip`.
+   Il file zip verrà posizionato in `StardewNavigator/bin/Release/net6.0/StardewNavigator [Versione].zip` (o `Debug/net6.0` se compilato in Debug).
 3. **Verifica ZIP (Checklist Pre-Release)**: Scompattare temporaneamente o ispezionare il file ZIP generato per verificare che contenga la build compilata corretta, che le risorse (cartella `assets/`, cartella `i18n/`) siano presenti ed aggiornate, e che il `manifest.json` mostri la versione corretta appena configurata.
 4. **Commit Bump**: Committare la modifica del manifest (`git commit -m "chore(manifest): bump version to vX.Y.Z"`).
 5. **Tagging**: Creare il tag Git corrispondente (`git tag vX.Y.Z`).
@@ -152,7 +159,7 @@ Per mantenere questo file conciso ed evitare letture non necessarie ad ogni turn
 
 * **Task relativi all'input, modificatori, scorciatoie, o all'interazione con l'ambiente**:
   - Documento da consultare: `@./docs/input-management.md`
-  - Ambiti coperti: Modifiche a `NumpadController.cs`, tasti modificatori (`Ctrl`, `Alt`, `Shift`), soppressione, rate-limiting, cooldown o interazioni con NVDA/AltGr.
+  - Ambiti coperti: Modifiche a `NumpadController.cs`, `GridMovement.cs`, `NumpadActionCatalog.cs`, tasti modificatori (`Ctrl`, `Alt`, `Shift`), soppressione, rate-limiting, cooldown o interazioni con NVDA/AltGr.
 
 * **Task che coinvolgono stringhe UI, messaggi vocali, nomi di destinazioni o configurazione GMCM**:
   - Documento da consultare: `@./docs/localization.md`
