@@ -84,6 +84,17 @@ namespace StardewNavigator.Features.Navigator
         {
             if (!Context.IsWorldReady) return;
 
+            // LeftAlt + T: Apre direttamente il menu di configurazione del tastierino
+            if (e.Button == SButton.T && _helper.Input.IsDown(SButton.LeftAlt))
+            {
+                if (Context.IsPlayerFree)
+                {
+                    _helper.Input.Suppress(SButton.T);
+                    Game1.activeClickableMenu = new NumpadConfigMenu();
+                    return;
+                }
+            }
+
             // Intercetta e gestisce i tasti del tastierino numerico (Numpad)
             if (NumpadController.HandleButton(e, _navigator, _destinationRegistry, _routeEngine))
             {
