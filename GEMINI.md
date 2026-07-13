@@ -101,6 +101,16 @@ Per installare, aggiornare o disinstallare manualmente il mod in locale, fare do
 
 ## 5. Pattern architetturali e convenzioni interne
 
+### Flusso di Dispatch dell'Input Numpad
+Qualsiasi pressione di un tasto sul tastierino numerico fluisce attraverso questi passaggi sequenziali:
+1. **Intercettazione**: L'evento `ButtonPressed` in `NavigatorFeature.cs` lo cattura ad alta priorità.
+2. **Orchestrazione e pre-guard**: `NumpadController.HandleButton` esegue controlli fisici preliminari (NumLock, WorldReady, PlayerFree), risolve i casi speciali hardcoded (tasto Decimal, navigazione nel menu NavigatorMenu aperto, micro-movimenti Ctrl) e interroga il registro.
+3. **Risoluzione logica**: `NumpadProfileRegistry.TryResolveAction` unisce il profilo corrente (Blind/Sighted) con il dizionario delle mappature personalizzate `NumpadOverrides`, applicando lo swap automatico e filtrando le chiavi disattivate (`None`).
+4. **Esecuzione**:
+   - Le azioni che richiedono repeat continui o cooldown interni rimangono nel loop dei tick o nel dispatcher di `NumpadController` (es. repeat di TileViewer, ripetizione di `GridMovement.MoveGrid`).
+   - Le letture di fallback nel mondo (ReadTile) vengono delegate a `TileInspector.cs`.
+   - Tutte le altre azioni logiche standard sono delegate a `NumpadActionCatalog.Execute`.
+
 ### Localizzazione al Caricamento (Option A)
 Per mantenere il codice semplice, i file `navigator_destinations.json` contengono le sole chiavi i18n (es. `"nav.map.farm"`). `DestinationRegistry.cs` risolve e sostituisce queste chiavi con le stringhe localizzate corrispondenti a runtime all'interno del metodo `ResolveCoordinates()`, eseguito ad ogni caricamento di partita (`SaveLoaded`).
 

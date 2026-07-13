@@ -14,6 +14,14 @@ Per bilanciare le prestazioni del gioco ed evitare riferimenti ad oggetti obsole
 2. **Risoluzione dinamica delle istanze**: Le istanze runtime delle classi di `stardew-access` (es. `MainClass.ScreenReader`, `ObjectTracker.Instance`, `TileViewer.Instance`) vengono recuperate dinamicamente tramite `GetValue(null)` ad ogni chiamata. Questo previene bug dovuti a istanze transienti o ricreate da SMAPI.
 3. **Fail-safe robusto**: Tutte le chiamate via reflection sono protette da blocchi `try-catch` generali per intercettare eventuali eccezioni di reflection (`TargetInvocationException`, `NullReferenceException`) e loggarle come avvisi (`Log.Warn`), impedendo al gioco di crashare.
 
+### Confini tra Bridge e moduli standalone dedicati
+Per mantenere pulita l'architettura a runtime, il codice è diviso secondo precise regole di dominio:
+* **`StardewAccessBridge.cs`**: Deve contenere *esclusivamente* codice di reflection (assembly lookup, caching di metadati, invocazioni dinamiche ed interfacce verso l'assembly esterno `stardew-access`). Non deve mai contenere logiche di gameplay di *Stardew Valley* (es. calcoli di collisione, coordinate, o parsing di stringhe).
+* **`TileInspector.cs`**: Incapsula esclusivamente la logica e le query di gioco necessarie a ispezionare l'ambiente (alberi, oggetti, NPC) in modalità standalone, traducendole in descrizioni.
+* **`GridMovement.cs`**: Incapsula esclusivamente la simulazione dei movimenti cardinali standalone del personaggio (collisioni, Warp, allineamento tile).
+
+Il controller e gli helper interrogano prima `StardewAccessBridge` (ramo prioritario) e, solo in caso di esito negativo o assenza di stardew-access, ripiegano rispettivamente su `TileInspector` e `GridMovement`.
+
 ---
 
 ## 2. Contratti e Comportamenti Osservati

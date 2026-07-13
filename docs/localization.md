@@ -89,6 +89,10 @@ Il file `assets/navigator_destinations.json` **non contiene mai testo localizzat
   return helper.Translation.Get("numpad-read-tile-tree", new { tree_name = resolvedTreeName, stage = ... });
   ```
 
+### Localizzazione di annunci dinamici e stati
+Non comporre mai nel codice C# messaggi vocali unendo lemmi o pluralizzazioni hardcoded (ad esempio unendo il numero al suffisso `"items."` o impostando lo stato `"Empty."` come stringa letterale). 
+Tutte le risposte vocali composte e gli stati dinamici devono fare uso di chiavi i18n configurate con token (es. `numpad-config-item-count` con il parametro `{{count}}`) o chiavi statiche dedicate (es. `numpad-config-empty`).
+
 ---
 
 ## 5. Token di Interpolazione `{{...}}`
