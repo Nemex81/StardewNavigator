@@ -309,7 +309,10 @@ namespace StardewNavigator.Features.Navigator
             if (_currentLevel == MenuLevel.Level1)
             {
                 string baseTitle = ModEntry.Helper.Translation.Get("numpad-config-title").ToString();
-                string profileName = ModEntry.Config.ActiveNumpadProfile.ToString();
+                string profileKey = ModEntry.Config.ActiveNumpadProfile == NumpadProfileId.Blind 
+                    ? "numpad-config-profile-blind" 
+                    : "numpad-config-profile-sighted";
+                string profileName = ModEntry.Helper.Translation.Get(profileKey).ToString();
                 return $"{baseTitle} ({profileName})";
             }
 
@@ -404,8 +407,8 @@ namespace StardewNavigator.Features.Navigator
                             .ToList();
 
                     case CatProfile:
-                        string blindLabel = (ModEntry.Config.ActiveNumpadProfile == NumpadProfileId.Blind ? "[X] " : "[  ] ") + "Blind";
-                        string sightedLabel = (ModEntry.Config.ActiveNumpadProfile == NumpadProfileId.Sighted ? "[X] " : "[  ] ") + "Sighted";
+                        string blindLabel = (ModEntry.Config.ActiveNumpadProfile == NumpadProfileId.Blind ? "[X] " : "[  ] ") + ModEntry.Helper.Translation.Get("numpad-config-profile-blind").ToString();
+                        string sightedLabel = (ModEntry.Config.ActiveNumpadProfile == NumpadProfileId.Sighted ? "[X] " : "[  ] ") + ModEntry.Helper.Translation.Get("numpad-config-profile-sighted").ToString();
                         return new List<string> { blindLabel, sightedLabel };
 
                     default:
@@ -630,7 +633,10 @@ namespace StardewNavigator.Features.Navigator
         private void AnnounceCurrentView()
         {
             string viewName = GetTitleText();
-            string profileName = ModEntry.Config.ActiveNumpadProfile.ToString();
+            string profileKey = ModEntry.Config.ActiveNumpadProfile == NumpadProfileId.Blind 
+                ? "numpad-config-profile-blind" 
+                : "numpad-config-profile-sighted";
+            string profileName = ModEntry.Helper.Translation.Get(profileKey).ToString();
             string profileIndicator = ModEntry.Helper.Translation.Get("numpad-config-current-profile", new { profile = profileName }).ToString();
             
             if (_currentLevel == MenuLevel.Level1)
@@ -641,7 +647,7 @@ namespace StardewNavigator.Features.Navigator
             else
             {
                 List<string> items = GetCurrentItems();
-                string countAnnouncement = $"{items.Count} items.";
+                string countAnnouncement = ModEntry.Helper.Translation.Get("numpad-config-item-count", new { count = items.Count }).ToString();
                 int idx = _currentLevel == MenuLevel.Level2 ? _detailIndex : _actionIndex;
 
                 if (items.Count > 0 && idx >= 0 && idx < items.Count)
@@ -650,7 +656,7 @@ namespace StardewNavigator.Features.Navigator
                 }
                 else
                 {
-                    NavigatorSpeaker.Say($"{viewName}. Empty.", true);
+                    NavigatorSpeaker.Say($"{viewName}. " + ModEntry.Helper.Translation.Get("numpad-config-empty").ToString(), true);
                 }
             }
         }

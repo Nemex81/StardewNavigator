@@ -28,11 +28,11 @@ namespace StardewNavigator.Features.Navigator
         /// </summary>
         public static readonly IReadOnlyList<GlobalBindingInfo> GlobalBindings = new List<GlobalBindingInfo>
         {
-            new("Decimal", "AliasEnter", ModEntry.Helper.Translation.Get("numpad-action-desc-Interact").ToString() + " / Confirm (Enter)"),
-            new("Ctrl + NumPad8/2/4/6", "MicroMove", "Smooth micro-movement (pixel-by-pixel)"),
-            new("NumPad8/2 (in Menu)", "NavMenuCursorUp/Down", "Navigate navigator menu items"),
-            new("Ctrl + NumPad5 (in Menu)", "NavMenuConfirm", "Confirm navigator menu selection"),
-            new("Ctrl + NumPad5 (other Menu)", "AliasCtrlEnter", "Confirm active selection (Ctrl + Enter)")
+            new("Decimal", "AliasEnter", ModEntry.Helper.Translation.Get("numpad-config-global-desc-decimal").ToString()),
+            new("Ctrl + NumPad8/2/4/6", "MicroMove", ModEntry.Helper.Translation.Get("numpad-config-global-desc-micromove").ToString()),
+            new("NumPad8/2 (in Menu)", "NavMenuCursorUp/Down", ModEntry.Helper.Translation.Get("numpad-config-global-desc-navmenu-cursor").ToString()),
+            new("Ctrl + NumPad5 (in Menu)", "NavMenuConfirm", ModEntry.Helper.Translation.Get("numpad-config-global-desc-navmenu-confirm").ToString()),
+            new("Ctrl + NumPad5 (other Menu)", "AliasCtrlEnter", ModEntry.Helper.Translation.Get("numpad-config-global-desc-ctrl-enter").ToString())
         };
     }
 

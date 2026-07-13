@@ -127,6 +127,15 @@
   "numpad-err-critical-unmapped": "L'azione critica {{action}} non è assegnata! Assegnala prima di salvare.",
   "numpad-err-reserved-key": "Questo tasto è riservato alle funzioni di sistema.",
   "numpad-info-binding-moved": "{{action}} spostata su {{newKey}}.",
-  "numpad-info-reset-complete": "Tasti del tastierino ripristinati ai valori predefiniti."
+  "numpad-info-reset-complete": "Tasti del tastierino ripristinati ai valori predefiniti.",
+  "numpad-config-item-count": "{{count}} elementi.",
+  "numpad-config-empty": "Vuoto.",
+  "numpad-config-profile-blind": "Non Vedente (Blind)",
+  "numpad-config-profile-sighted": "Vedente (Sighted)",
+  "numpad-config-global-desc-decimal": "Interagisci / Conferma (Enter)",
+  "numpad-config-global-desc-micromove": "Micro-movimento fluido (pixel per pixel)",
+  "numpad-config-global-desc-navmenu-cursor": "Naviga tra le voci del menu navigatore",
+  "numpad-config-global-desc-navmenu-confirm": "Conferma selezione nel menu navigatore",
+  "numpad-config-global-desc-ctrl-enter": "Conferma selezione attiva (Ctrl + Enter)"
 }
 

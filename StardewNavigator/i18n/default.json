@@ -127,6 +127,15 @@
   "numpad-err-critical-unmapped": "Critical action {{action}} is not mapped! Assign it before saving.",
   "numpad-err-reserved-key": "This key is reserved for system functions.",
   "numpad-info-binding-moved": "{{action}} moved to {{newKey}}.",
-  "numpad-info-reset-complete": "Numpad bindings reset to default."
+  "numpad-info-reset-complete": "Numpad bindings reset to default.",
+  "numpad-config-item-count": "{{count}} items.",
+  "numpad-config-empty": "Empty.",
+  "numpad-config-profile-blind": "Blind",
+  "numpad-config-profile-sighted": "Sighted",
+  "numpad-config-global-desc-decimal": "Interact / Confirm (Enter)",
+  "numpad-config-global-desc-micromove": "Smooth micro-movement (pixel-by-pixel)",
+  "numpad-config-global-desc-navmenu-cursor": "Navigate navigator menu items",
+  "numpad-config-global-desc-navmenu-confirm": "Confirm navigator menu selection",
+  "numpad-config-global-desc-ctrl-enter": "Confirm active selection (Ctrl + Enter)"
 }
 
