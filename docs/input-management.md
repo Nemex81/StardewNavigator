@@ -46,11 +46,17 @@ Per innescare le azioni di gioco tramite il tastierino, simuliamo fisicamente gl
 
 ### A. Interazione / Azione (NumPad3)
 * **Comportamento Osservato (stardew-access v1.7.0-beta.2)**: stardew-access intercetta le chiamate dirette a `Game1.currentLocation.checkAction` o `checkForAction` eseguite da mod esterne e restituisce `false` (bloccando l'apertura di casse/bauli).
-* **Soluzione (Contratto del Progetto)**: In `NumpadController.cs`, l'azione di `NumPad3` simula la pressione del pulsante fisico nativo `SButton.X` tramite `ModEntry.Helper.Input.Press(SButton.X)`. Questo aggira il blocco e permette al ciclo nativo di gioco di eseguire l'azione in modo del tutto analogo a un click fisico.
+* **Soluzione (Contratto del Progetto)**: In `NumpadActionCatalog.cs`, l'azione di `NumPad3` (`Interact`) simula la pressione del pulsante fisico nativo `SButton.X` tramite `ModEntry.Helper.Input.Press(SButton.X)`. Questo aggira il blocco e permette al ciclo nativo di gioco di eseguire l'azione in modo analogo a un click fisico.
 
-### B. Cooldown su Uso Attrezzi (NumPad1)
+### B. Cooldown e Simulazione su Uso Attrezzi (NumPad1)
 * **Contratto del Progetto**: L'uso dell'attrezzo tramite `NumPad1` deve possedere un cooldown integrato per prevenire attivazioni a raffica incontrollate (rapid-fire) che consumerebbero l'energia del giocatore in pochi istanti.
-* **Comportamento Standalone**: Quando stardew-access non è attivo, viene applicato un cooldown logico manuale di **20 ticks** (~333 ms a 60 FPS, tempo stimato per un'animazione singola dell'attrezzo) memorizzato in `_lastUseToolTick`. Se stardew-access è attivo, la mod delega la gestione del rate-limiting alla simulazione interna dell'input.
+* **Comportamento Unificato**: Il cooldown logico di **20 ticks** (~333 ms a 60 FPS, tempo stimato per un'animazione singola dell'attrezzo) memorizzato in `_lastUseToolTick` viene applicato **sempre** a livello di dispatcher in `NumpadController.cs`, sia con stardew-access che in standalone.
+* **Simulazione Pressione Fisica per Spade**: Anziché chiamare il metodo di gioco logico `Game1.pressUseToolButton()` (che non funziona per le armi da mischia come la spada, in quanto non ereditano da `Tool`), l'azione `UseTool` in `NumpadActionCatalog.cs` rileva dinamicamente quale tasto è mappato nelle opzioni del gioco per l'uso dello strumento (`Game1.options.useToolButton`, di default `C` o click sinistro) e ne simula la reale pressione fisica tramite SMAPI.
+
+### C. Personalizzazione Input e Keymapper (UI-2)
+* **Configurazione dinamica**: Tramite la scorciatoia globale **`LeftAlt + T`** (catturata ad alta priorità in `NavigatorFeature.cs` quando il giocatore è libero) si accede in-game a un menu a tre livelli (`NumpadConfigMenu`) che consente di impostare override dinamici memorizzati in `ModConfig.NumpadOverrides`.
+* **Disattivazione con `None`**: È possibile mappare un tasto all'azione `None` (valore `0` dell'enum `NumpadActionId`). Se il tasto fa parte dei 17 fisici del tastierino numerico, il controller sopprimerà l'input impedendo azioni involontarie, mentre se è un tasto esterno (es. frecce direzionali) lo lascerà passare al gioco in pass-through.
+* **Protezione Azioni Critiche**: Il resolver centralizzato `NumpadProfileRegistry` impedisce la disattivazione o la rimozione totale delle 5 azioni critiche obbligatorie per un giocatore non vedente (`GridMoveUp`, `GridMoveDown`, `GridMoveLeft`, `GridMoveRight`, `OpenNavigatorMenu`), forzando il ripristino di fabbrica se non c'è almeno un tasto associato ad esse.
 
 ---
 

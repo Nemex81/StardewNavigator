@@ -2,11 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.2.11] - 2026-07-12
+## [1.2.11] - 2026-07-13
+
+### Added
+- **Numpad Keymapper (UI-2)**: Implemented in-game dynamic key rebinding menu (`NumpadConfigMenu`) accessible via the new global shortcut **`LeftAlt + T`** (when player is free).
+- **Custom Overrides & Active Profiles**: Support for `Blind` and `Sighted` presets, runtime overrides, automatic action swapping (1:1 constraint), and validation logic to prevent unmapping critical actions.
+- **Key Disabling with `None`**: Added the special `None` action to logically disable numpad keys. Disabled physical numpad keys are suppressed, while non-numpad keys (e.g. arrow keys) are passed through to the game.
+- **Melee Weapons Support (UseTool)**: Updated `UseTool` (`NumPad1`) to dynamically detect the game's configured `useToolButton` (default `C`) and simulate its physical press via SMAPI, allowing melee weapons (swords) to perform swings successfully.
 
 ### Fixed
 - **NumPad3 Interaction**: Resolved an issue where chest interactions via `NumPad3` were blocked by stardew-access 1.7.0 beta 2. Implemented simulation of native `SButton.X` press to reliably trigger interactions.
 - **Alt + Cursor Movement Override**: Fixed a critical bug where holding `LeftAlt` while pressing directional arrows or Numpad movement keys (e.g. `NumPad2`) to move the TileViewer cursor would still trigger player movement. We now actively clear stardew-access's internal grid movement state (`LastGridMovementButtonPressed` and `LastGridMovementDirection`) via reflection to prevent it from erroneously acting on suppressed keys.
+
+### Refactored
+- **NumpadController Decoupling**: Extracted two major responsibilities from `NumpadController.cs` to separate static classes, reducing its size by ~30% and improving cohesion:
+  - **`TileInspector.cs`**: Contains all standalone tile-probing and descriptions.
+  - **`GridMovement.cs`**: Handles fallback cardinal tile step navigation logic, collision checking, warp transitions, and terrain sounds.
 
 ## [1.2.10] - 2026-07-12
 

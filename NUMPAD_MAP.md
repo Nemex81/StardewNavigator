@@ -12,12 +12,12 @@ Comandi di locomozione, interazione primaria e lettura ambientale di base.
 
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
-| **8, 2, 4, 6** | Movimento a griglia (Nord, Sud, Ovest, Est) | Delega a `stardew-access` se presente, altrimenti fallback locale. |
-| **1** | Usa Attrezzo | Chiama `pressUseToolButton()` con cooldown 20 ticks (~333ms). Valido per tutti i giocatori (con/senza stardew-access, vedenti e non vedenti). |
-| **3** | Azione / Interazione | Chiama `location.checkAction()` direttamente sulla tile di fronte (apre bauli, parla con NPC, interagisce con macchine). Fallback a `pressActionButton` (stato XNA grezzo) per porte ed eventi speciali. |
-| **5** | Leggi Tile di fronte | Lettura del blocco davanti al giocatore. |
+| **8, 2, 4, 6** | Movimento a griglia (Nord, Sud, Ovest, Est) | Delega a `stardew-access` se presente, altrimenti fallback locale (`GridMovement`). |
+| **1** | Usa Attrezzo | Simula la pressione fisica del tasto configurato in gioco (default: `C` / Left Click) con cooldown 20 ticks (~333ms). Valido per tutti i giocatori (con/senza stardew-access, vedenti e non vedenti) e supporta le armi da mischia (spade). |
+| **3** | Azione / Interazione | Simula la pressione fisica di `SButton.X` sulla tile di fronte (apre bauli, parla con NPC, interagisce con macchine). Evita le intercettazioni bloccanti dei chest. |
+| **5** | Leggi Tile di fronte | Lettura del blocco davanti al giocatore (tramite `stardew-access` o fallback locale `TileInspector`). |
 | **7** | Slot precedente hotbar | Seleziona lo slot attivo precedente della toolbar (wrapping circolare su 12 slot). |
-| **0** | Leggi Coordinate | Emula il tasto `K` di stardew-access. |
+| **0** | Leggi Coordinate | Emula il tasto `K` di stardew-access (fallback locale TTS). |
 | **9** | Slot successivo hotbar | Seleziona lo slot attivo successivo della toolbar (wrapping circolare su 12 slot). |
 | **`.` (Decimal)** | Alias di Enter (tutti i contesti) | Simula `Enter` nel mondo, nell'inventario, nel Menu Navigatore e in qualsiasi altro menu. Non richiede modificatori. `SButton.Decimal` ≠ `OemPeriod` (tastiera alfanumerica). |
 
@@ -29,8 +29,8 @@ Tasti operativi e navigazione categorie scanner.
 
 | Tasto Numpad | Azione | Note / Emulazione |
 | :--- | :--- | :--- |
-| **`*` (Moltiplica)** | Apri Inventario | Apre il `GameMenu` nativo (tab Inventario), speculare a `E` o `Esc`. |
-| **`/` (Dividi)** | Apri Menu Navigatore | Alternativa ergonomica al tasto `9` e `G`. |
+| **`*` (Moltiplica)** | Apri Inventario | Apre il `GameMenu` nativo (tab Inventario), speculare a `E` or `Esc`. |
+| **`/` (Dividi)** | Apri Menu Navigatore | Alternativa ergonomica al tasto `9` e `G`. *(Nota: la voce "Configura Tastierino" è stata rimossa da questo menu ed è ora accessibile direttamente tramite la scorciatoia `LeftAlt + T`)*. |
 | **`+` (Più)** | Ciclo Scanner: Gruppo Oggetti (Su) | Speculare a `PageUp`. |
 | **`-` (Meno)** | Ciclo Scanner: Gruppo Oggetti (Giù) | Speculare a `PageDown`. |
 
@@ -45,6 +45,7 @@ Quando il Menu Navigatore è aperto (con `G` o `/`), i seguenti tasti del tastie
 | **8** | Voce precedente | Sposta il cursore verso l'alto nella lista destinazioni o POI. |
 | **2** | Voce successiva | Sposta il cursore verso il basso nella lista destinazioni o POI. |
 | **Ctrl + 5** | Conferma selezione | Conferma la destinazione/POI selezionato e avvia il percorso automatico. |
+| **`LeftAlt + T`** | Configura Tastierino | **Scorciatoia globale** in-game per aprire il Numpad Configuration Menu a tre livelli (disponibile nel mondo quando il giocatore è libero). Permette di mappare i tasti ad azioni o disattivarli assegnandoli a `None`. |
 
 ---
 
@@ -112,7 +113,7 @@ Al fine di evitare collisioni e mantenere la configurazione snella, le seguenti 
 * **Ctrl/Shift + 7**: Nessuna assegnazione. `Ctrl+7` e `Shift+7` non sono gestiti.
 * **Modificatori (Ctrl/Alt/Shift) + `*` (Moltiplica)**: Nessuna assegnazione. `Multiply` e `Divide` senza modificatori aprono rispettivamente Inventario e Menu Navigatore — funzioni standalone non dipendenti da stardew-access.
 * **Modificatori (Ctrl/Alt/Shift) + `/` (Dividi)**: Nessuna assegnazione.
-* **Altre combinazioni non elencate**: Se non specificato sopra, la combinazione non è gestita da NumpadController.
+* **Altre combinazioni non elencate**: Se non specificato sopra, la combinazione non è gestita dal controller.
 
 ---
-*Documentazione generata conformemente all'implementazione reale nel file `NumpadController.cs`.*
+*Documentazione allineata all'architettura reale implementata in `NumpadController.cs`, `NumpadActionCatalog.cs`, `TileInspector.cs` e `GridMovement.cs`.*

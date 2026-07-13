@@ -9,19 +9,19 @@ StardewNavigator is a standalone pathfinding and navigation mod for Stardew Vall
 - **Numpad Navigation & Grid Movement**: Classic numeric keypad layout for manual movement, inspection, coordinates, menu, and scanner controls (active when `NumLock` is ON).
 - **stardew-access Reflection Bridge**: Direct, dynamic integration with `stardew-access`'s TileViewer cursor and Auto-Walk scanner features via numeric keypad.
 - **Mouse & Resize Support**: Recalculates menu layout on window resize, highlights items on hover, and allows click-to-confirm POI selections for sighted players.
-- **Accessibility Integration**: If `Stardew Access` is installed, navigation instructions and numpad inspects are read aloud via NVDA/SAPI.
-- **Visual Fallback**: If `Stardew Access` is not installed, temporary HUD messages are displayed on-screen.
+- **Accessibility Integration**: If `Stardew Access` is installed, navigation instructions and numpad inspects are read aloud via its screen-reader integration.
+- **Standalone TTS Fallback**: If `Stardew Access` is not installed, the mod falls back to a built-in speech synthesis engine (SAPI on Windows) to voice out directions and tile details.
 - **Customizable**:
   - Keybind to open the navigation menu (default: `G`).
+  - Shortcut **`LeftAlt + T`** to open the interactive Numpad Configuration Menu in-game (allows swapping actions, selecting Sighted/Blind profiles, and disabling keys with `None`).
   - Toggle Numpad controls active/inactive in config (default: `true`).
-  - Duration of on-screen HUD messages.
   - Fully compatible with Generic Mod Config Menu.
 
 ## Installation
 1. Installa SMAPI (https://smapi.io/)
 2. Scarica l'ultima release dalla pagina Releases di GitHub
 3. Decomprimi e copia la cartella StardewNavigator in Stardew Valley/Mods/
-4. Avvia il gioco via SMAPI
+4. Avvia le opzioni di configurazione tramite Generic Mod Config Menu o la shortcut `LeftAlt + T`.
 Opzionale: installa Stardew Access per integrazione screen reader completa.
 
 ## Compatibility
@@ -29,16 +29,17 @@ Opzionale: installa Stardew Access per integrazione screen reader completa.
 - SMAPI 4.0+
 - Generic Mod Config Menu (opzionale)
 - **Stardew Access** (opzionale — https://github.com/stardew-access/stardew-access):
-  - StardewNavigator works fully in **standalone mode**, using on-screen HUD messages as fallback.
+  - StardewNavigator works fully in **standalone mode**, using the internal TTS engine as fallback.
   - When `stardew-access` is present, it is integrated via a dedicated layer (`StardewAccessBridge`). If the integration is not active or becomes unavailable during runtime, the mod automatically falls back to local standalone behaviors.
 
 ## Configuration
 
-You can configure the mod via the `config.json` file generated in the mod folder after running the game once, or in-game via the **Generic Mod Config Menu**:
+You can configure the mod via the `config.json` file generated in the mod folder after running the game once, in-game via the **Generic Mod Config Menu**, or directly in-game using the **`LeftAlt + T`** keymapper menu:
 
 - `NavigatorMenuKey`: The keybind used to open the navigation menu (default: `G`).
 - `NumpadControlsActive`: Toggle the Numpad navigation shortcut controls (default: `true`).
-- `HudMessageDuration`: The time (in seconds) that on-screen fallback messages remain visible (default: `4.0` seconds).
+- `ActiveNumpadProfile`: Choose between `Blind` (full screen-reader controls) and `Sighted` (movement/hotbar/inventory only) profiles.
+- `NumpadOverrides`: Custom runtime physical-to-logical overrides (handled in-game via `LeftAlt + T`).
 
 ## Numpad Controls (NumLock ON)
 
@@ -49,8 +50,8 @@ When **NumLock is ON**, the numeric keypad acts as a layered interface for movem
 
 ### 1. Base Level (No Modifiers)
 - **`8, 2, 4, 6`**: Move grid up, down, left, right (delegates to `stardew-access` if available, otherwise fallback locale).
-- **`1`**: Use Tool — calls `pressUseToolButton()` with 20-tick cooldown. Works for all players (sighted or screen-reader, with or without stardew-access). Triggers axe, hoe, fishing rod, sword, watering can, etc.
-- **`3`**: Action/Interact — calls `location.checkAction()` directly on the facing tile (opens chests, talks to NPCs, uses machines). Falls back to `pressActionButton` for special doors and events.
+- **`1`**: Use Tool — simulates the physical press of the configured use tool button (default: `C` / Left Click) with a 20-tick cooldown. Supports all tool types including melee weapons (swords).
+- **`3`**: Action/Interact — simulates the physical press of `SButton.X` to reliably trigger chest openings, NPC dialogues, and machine interactions (bypassing stardew-access interception).
 - **`5`**: Read tile in front of the player (facing tile).
 - **`7`**: Select previous hotbar slot (circular wrapping over 12 slots).
 - **`9`**: Select next hotbar slot (circular wrapping over 12 slots).
@@ -63,6 +64,7 @@ When the Navigator Menu is active, the numpad provides direct navigation without
 - **`2`**: Move cursor down in the list (next destination or POI).
 - **`LeftCtrl + 5`**: Confirm the current selection and start the automated route.
 
+> **`LeftAlt + T` is the global shortcut** to open the Numpad Configuration Menu at any time in the world (when the player is free).
 > **`LeftCtrl + NumPad5` is context-aware**: it confirms the Navigator Menu selection when that menu is open, acts as `LeftCtrl + Enter` in any other menu (inventory, shops, dialogues…), and triggers Object Tracker Auto-Walk when no menu is open.
 
 ### 2. LeftCtrl Level (Character Physics & Actions)

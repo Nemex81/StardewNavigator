@@ -21,7 +21,7 @@ Per bilanciare le prestazioni del gioco ed evitare riferimenti ad oggetti obsole
 Nello sviluppo dell'integrazione è fondamentale distinguere il livello di garanzia dei comportamenti e delle API esterne:
 
 ### A. Contratto del Progetto (Garanzie di StardewNavigator)
-* **Funzionamento Standalone**: Se `IsModLoaded` restituisce `false`, StardewNavigator non deve mai tentare accessi in reflection. Le letture ambientali (coordinate, tile, oggetti impugnati) devono ripiegare su implementazioni locali e mostrare l'output testuale tramite messaggi temporanei a schermo (`Game1.addHUDMessage`).
+* **Funzionamento Standalone**: Se `IsModLoaded` restituisce `false`, StardewNavigator non deve mai tentare accessi in reflection. Le letture ambientali (coordinate, tile, oggetti impugnati, statistiche vitali) devono ripiegare su implementazioni locali e riprodurre l'output vocalizzato tramite il sintetizzatore interno della mod (`NavigatorSpeaker.Say`), garantendo accessibilità acustica anche senza stardew-access.
 * **Intercettazione Prioritaria**: Gli eventi di pressione dei tasti in `NavigatorFeature.cs` sono registrati con priorità alta (`[EventPriority(EventPriority.High)]`) per permettere a StardewNavigator di sopprimere gli input prima che stardew-access li processi.
 
 ### B. Comportamento Osservato di stardew-access (v1.7.0-beta.2)
@@ -37,7 +37,7 @@ Nello sviluppo dell'integrazione è fondamentale distinguere il livello di garan
   * La classe `stardew_access.Features.GridMovement` con dei campi statici privati `LastGridMovementButtonPressed` (di tipo `InputButton?`) e `LastGridMovementDirection` (di tipo `int?`).
   * La classe `stardew_access.Features.TileViewer` con la proprietà statica `Instance` e i metodi `cursorMoveInput(Vector2 delta, bool sound)` e `startAutoWalking()`.
   * La classe `stardew_access.Features.ObjectTracker` con il metodo `moveToCurrentlySelectedObject()`.
-  * La classe `stardew_access.Features.ReadTile` con la proprietà statica `Instance` e il metodo `Run(bool manuallyTriggered, bool playersPosition)` (firma osservata in v1.7.0-beta.2). StardewNavigator lo invoca tramite reflection come `Run(true, standing)`, dove il primo argomento indica un'attivazione manuale esplicita e il secondo seleziona la tile sotto i piedi del giocatore (`true`) anziché quella di fronte (`false`).
+  * La classe `stardew_access.Features.ReadTile` con la proprietà statica `Instance` e il metodo `Run(bool manuallyTriggered, bool playersPosition)` (firma osservata in v1.7.0-beta.2). StardewNavigator lo invoca tramite reflection come `Run(true, standing)`, dove il primo argomento indica un'attivazione manuale esplicita e il secondo seleziona la tile sotto i piedi del giocatore (`true`) anziché quella di fronte (`false`). In caso di fallback standalone, la mod delega la lettura e l'ispezione alla classe dedicata `TileInspector.cs`.
 
 ---
 
