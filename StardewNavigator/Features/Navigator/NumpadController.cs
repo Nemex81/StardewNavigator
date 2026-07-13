@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using StardewValley.Pathfinding;
 using StardewNavigator.Integration;
 
 namespace StardewNavigator.Features.Navigator
@@ -185,7 +184,7 @@ namespace StardewNavigator.Features.Navigator
 
             if (currentTickBase - _lastStepTick >= repeatIntervalTicks)
             {
-                MoveGrid(_activeDirection);
+                GridMovement.MoveGrid(_activeDirection);
                 _lastStepTick = currentTickBase;
             }
         }
@@ -198,7 +197,7 @@ namespace StardewNavigator.Features.Navigator
             _lastStepTick = currentTick;
 
             // Eseguiamo il primo passo immediatamente
-            MoveGrid(direction);
+            GridMovement.MoveGrid(direction);
         }
 
         private static void ResetMovement()
@@ -405,74 +404,7 @@ namespace StardewNavigator.Features.Navigator
             return false;
         }
 
-        private static void MoveGrid(int direction)
-        {
-            if (!Context.IsPlayerFree) return;
 
-            Farmer player = Game1.player;
-            GameLocation location = Game1.currentLocation;
-            if (player == null || location == null) return;
-
-            // Giriamo il giocatore se guarda altrove
-            if (player.FacingDirection != direction)
-            {
-                player.faceDirection(direction);
-                Game1.playSound("dwop");
-                return;
-            }
-
-            // Coordinate della casella target
-            int targetX = (int)player.Tile.X;
-            int targetY = (int)player.Tile.Y;
-            switch (direction)
-            {
-                case 0: targetY--; break; // Up
-                case 1: targetX++; break; // Right
-                case 2: targetY++; break; // Down
-                case 3: targetX--; break; // Left
-            }
-
-            // Collision check
-            Rectangle pb = player.GetBoundingBox();
-            Rectangle tb = new Rectangle(targetX * 64, targetY * 64, pb.Width, pb.Height);
-            bool isColliding = location.isCollidingPosition(tb, Game1.viewport, true, 0, false, player);
-
-            if (isColliding)
-            {
-                // Controllo porta o azione
-                xTile.Dimensions.Location actionLoc = new xTile.Dimensions.Location(targetX * 64, targetY * 64);
-                if (location.checkAction(actionLoc, Game1.viewport, player))
-                {
-                    return; // porta aperta o azione avviata
-                }
-
-                // Controllo warp diretto
-                Rectangle position = new Rectangle(targetX * 64, targetY * 64, 64, 64);
-                Warp warp = location.isCollidingWithWarpOrDoor(position, player);
-                if (warp != null)
-                {
-                    Game1.playSound("doorOpen");
-                    player.warpFarmer(warp);
-                    return;
-                }
-
-                Game1.playSound("clank");
-                return;
-            }
-
-            // Spostamento e allineamento
-            player.Position = new Vector2(targetX * 64, targetY * 64);
-            location.playTerrainSound(player.Tile);
-
-            // Controllo warp sulla nuova posizione
-            Rectangle newPosition = new Rectangle(targetX * 64, targetY * 64, 64, 64);
-            Warp newWarp = location.isCollidingWithWarpOrDoor(newPosition, player);
-            if (newWarp != null)
-            {
-                Game1.playSound("doorOpen");
-                player.warpFarmer(newWarp);
-            }
-        }
 
         private static void ReadTile(bool standing)
         {
