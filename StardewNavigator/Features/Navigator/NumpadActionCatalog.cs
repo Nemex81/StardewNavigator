@@ -73,8 +73,28 @@ namespace StardewNavigator.Features.Navigator
 
                 // ── Direct interaction ─────────────────────────────────────────────
                 case NumpadActionId.UseTool:
-                    // Cooldown check is enforced by the caller (NumpadController._lastUseToolTick).
-                    Game1.pressUseToolButton();
+                    // Simulates the native use tool button (default: C). Required for melee weapons
+                    // since Game1.pressUseToolButton() only triggers Tool subclasses (axe, pickaxe)
+                    // but not MeleeWeapon subclasses (swords).
+                    var useToolButtons = Game1.options.useToolButton;
+                    if (useToolButtons != null && useToolButtons.Length > 0)
+                    {
+                        foreach (var btn in useToolButtons)
+                        {
+                            if (btn.key != Microsoft.Xna.Framework.Input.Keys.None)
+                            {
+                                if (Enum.TryParse<SButton>(btn.key.ToString(), out var sBtn))
+                                {
+                                    ModEntry.Helper.Input.Press(sBtn);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ModEntry.Helper.Input.Press(SButton.C);
+                    }
                     break;
 
                 case NumpadActionId.Interact:
