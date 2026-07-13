@@ -45,6 +45,7 @@ Il repository è strutturato come segue:
     - [NumpadActionCatalog.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NumpadActionCatalog.cs): Catalogo delle azioni semantiche eseguibili dal tastierino.
     - [NumpadProfileRegistry.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NumpadProfileRegistry.cs): Registro dei profili predefiniti (Blind/Sighted) e degli override dinamici.
     - [NumpadConfigMenu.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NumpadConfigMenu.cs): Menu in-game per la personalizzazione interattiva dei tasti.
+    - [NumpadConfigSession.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/NumpadConfigSession.cs): Coordinatore logico della sessione e dei filtri del menu.
     - [InputChord.cs](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/Features/Navigator/InputChord.cs): Rappresentazione delle combinazioni di tasti e tasti modificatori.
   - [assets/](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/assets/):
     - [navigator_destinations.json](file:///C:/Users/nemex/OneDrive/Documenti/GitHub/StardewNavigator/StardewNavigator/assets/navigator_destinations.json): Registro strutturato con chiavi i18n per le mappe e i punti di interesse calcolabili.
