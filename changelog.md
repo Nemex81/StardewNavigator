@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.12] - 2026-07-14
+
+### Added
+- **Nexus Mods Update Key**: Added the official Nexus Mods update key (`Nexus:49156`) to the mod manifest for automated SMAPI update notifications.
+
 ## [1.2.11] - 2026-07-13
 
 ### Added

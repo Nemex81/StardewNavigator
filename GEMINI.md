@@ -154,7 +154,7 @@ Per pubblicare una nuova versione del mod, attenersi rigorosamente alla seguente
 
 ## 7. Stato attuale e prossimi passi
 
-- **Versione Corrente**: `1.2.11` (tracciata nel manifest.json).
+- **Versione Corrente**: `1.2.12` (tracciata nel manifest.json).
 - **Prossimi punti di attenzione**:
   - Validare il funzionamento dell'installer PowerShell su diverse configurazioni di Windows ExecutionPolicy.
   - Monitorare la reattività del check aggiornamenti asincrono all'avvio in condizioni di scarsa connettività di rete.
